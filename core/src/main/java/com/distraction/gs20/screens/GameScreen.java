@@ -11,9 +11,9 @@ import com.distraction.gs20.utils.MyViewport;
 public abstract class GameScreen {
 
     /**
-     * Flag for if this screen is at the top of the stack.
+     * Flag for if this screen should ignore input.
      */
-    protected boolean active;
+    public boolean ignoreInput = false;
 
     protected Context context;
 
@@ -35,10 +35,6 @@ public abstract class GameScreen {
 
         pixel = context.getImage("pixel");
     }
-
-    public abstract void onResume();
-
-    public abstract void onPause();
 
     protected abstract void handleInput();
 
