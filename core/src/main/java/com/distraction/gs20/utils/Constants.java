@@ -1,4 +1,4 @@
-package com.distraction.gs20;
+package com.distraction.gs20.utils;
 
 public class Constants {
 

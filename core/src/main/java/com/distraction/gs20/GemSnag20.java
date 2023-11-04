@@ -3,32 +3,34 @@ package com.distraction.gs20;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.distraction.gs20.screens.TitleScreen;
 
-/** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class GemSnag20 extends ApplicationAdapter {
-    private SpriteBatch batch;
-    private Texture image;
+
+    private Context context;
 
     @Override
     public void create() {
-        batch = new SpriteBatch();
-        image = new Texture("libgdx.png");
+        context = new Context();
+        context.gsm.push(new TitleScreen(context));
     }
 
     @Override
     public void render() {
         Gdx.gl.glClearColor(0.15f, 0.15f, 0.2f, 1f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        batch.begin();
-        batch.draw(image, 140, 210);
-        batch.end();
+
+        context.gsm.update(Gdx.graphics.getDeltaTime());
+        context.gsm.render(context.b);
+    }
+
+    @Override
+    public void resize(int width, int height) {
+        context.gsm.resize(width, height);
     }
 
     @Override
     public void dispose() {
-        batch.dispose();
-        image.dispose();
+        context.dispose();
     }
 }
