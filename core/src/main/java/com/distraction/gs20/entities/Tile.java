@@ -21,13 +21,22 @@ public class Tile extends Entity {
 
     public void setGem(Gem gem) {
         this.gem = gem;
+        gem.tile = this;
         gem.p.set(p);
+        gem.d.set(p);
     }
 
     public Gem takeGem() {
         Gem gem1 = gem;
         gem = null;
         return gem1;
+    }
+
+    @Override
+    public void update(float dt) {
+        if (gem != null) {
+            gem.update(dt);
+        }
     }
 
     @Override
@@ -40,10 +49,6 @@ public class Tile extends Entity {
         if (highlight) {
             b.setColor(Constants.TILE_HIGHLIGHT_COLOR);
             b.draw(pixel, sleft(), sbottom(), swidth(), sheight());
-        }
-
-        if (gem != null) {
-            gem.render(b);
         }
     }
 }

@@ -8,7 +8,6 @@ import com.badlogic.gdx.math.Vector2;
 import com.distraction.gs20.Context;
 import com.distraction.gs20.entities.ColorEntity;
 import com.distraction.gs20.entities.Gem;
-import com.distraction.gs20.entities.Hand;
 import com.distraction.gs20.entities.Pad;
 import com.distraction.gs20.entities.Tile;
 import com.distraction.gs20.utils.Constants;
@@ -20,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-public class PlayScreen extends GameScreen implements Hand.HandListener {
+public class PlayScreen extends GameScreen implements Gem.GemListener {
 
     private enum Stage {
         COUNTDOWN,
@@ -29,9 +28,15 @@ public class PlayScreen extends GameScreen implements Hand.HandListener {
     }
 
     public enum Difficulty {
-        EASY,
-        NORMAL,
-        CHALLENGE
+        EASY(0),
+        NORMAL(50),
+        CHALLENGE(100);
+
+        public final int points;
+
+        Difficulty(int points) {
+            this.points = points;
+        }
     }
 
     private final Map<ColorEntity.Type, Vector2> PAD_POSITIONS = new HashMap<>() {{
@@ -41,7 +46,7 @@ public class PlayScreen extends GameScreen implements Hand.HandListener {
         put(ColorEntity.Type.YELLOW, new Vector2(Constants.WIDTH * 0.0703f, Constants.HEIGHT * 0.5f));
     }};
 
-    private final Map<Integer, ColorEntity.Type> keyHandMap;
+    private final Map<Integer, ColorEntity.Type> keyPadMap;
 
     private final Difficulty difficulty;
     private Stage stage = Stage.COUNTDOWN;
@@ -50,9 +55,9 @@ public class PlayScreen extends GameScreen implements Hand.HandListener {
     private final Random random;
 
     private final Pad[] pads;
-    private final Hand[] hands;
     private final Tile[][] tiles;
     private final List<Tile> availableTiles;
+    private final List<Gem> gems;
 
     private float time;
     private Tile currentTile;
@@ -65,38 +70,40 @@ public class PlayScreen extends GameScreen implements Hand.HandListener {
 
         this.difficulty = difficulty;
 
-        gemSpawner = new GemSpawner(context, difficulty);
+        gemSpawner = new GemSpawner(context, difficulty, this);
         random = new Random();
 
-        keyHandMap = new HashMap<>();
         List<ColorEntity.Type> types = new ArrayList<>();
         types.add(ColorEntity.Type.GREEN);
-        keyHandMap.put(Input.Keys.D, ColorEntity.Type.GREEN);
-        keyHandMap.put(Input.Keys.RIGHT, ColorEntity.Type.GREEN);
         types.add(ColorEntity.Type.YELLOW);
-        keyHandMap.put(Input.Keys.A, ColorEntity.Type.YELLOW);
-        keyHandMap.put(Input.Keys.LEFT, ColorEntity.Type.YELLOW);
         if (difficulty == Difficulty.NORMAL) {
             types.add(ColorEntity.Type.RED);
-            keyHandMap.put(Input.Keys.W, ColorEntity.Type.RED);
-            keyHandMap.put(Input.Keys.UP, ColorEntity.Type.RED);
         }
         if (difficulty == Difficulty.CHALLENGE) {
             types.add(ColorEntity.Type.RED);
-            keyHandMap.put(Input.Keys.W, ColorEntity.Type.RED);
-            keyHandMap.put(Input.Keys.UP, ColorEntity.Type.RED);
             types.add(ColorEntity.Type.BLUE);
-            keyHandMap.put(Input.Keys.S, ColorEntity.Type.BLUE);
-            keyHandMap.put(Input.Keys.DOWN, ColorEntity.Type.BLUE);
         }
         pads = new Pad[types.size()];
-        hands = new Hand[types.size()];
         for (int i = 0; i < types.size(); i++) {
             ColorEntity.Type type = types.get(i);
             pads[i] = new Pad(context, type);
             pads[i].p.set(PAD_POSITIONS.get(type));
-            hands[i] = new Hand(context, type, this);
-            hands[i].setBasePosition(PAD_POSITIONS.get(type));
+        }
+
+        keyPadMap = new HashMap<>();
+        keyPadMap.put(Input.Keys.D, ColorEntity.Type.GREEN);
+        keyPadMap.put(Input.Keys.RIGHT, ColorEntity.Type.GREEN);
+        keyPadMap.put(Input.Keys.A, ColorEntity.Type.YELLOW);
+        keyPadMap.put(Input.Keys.LEFT, ColorEntity.Type.YELLOW);
+        if (difficulty == Difficulty.NORMAL) {
+            keyPadMap.put(Input.Keys.W, ColorEntity.Type.RED);
+            keyPadMap.put(Input.Keys.UP, ColorEntity.Type.RED);
+        }
+        if (difficulty == Difficulty.CHALLENGE) {
+            keyPadMap.put(Input.Keys.W, ColorEntity.Type.RED);
+            keyPadMap.put(Input.Keys.UP, ColorEntity.Type.RED);
+            keyPadMap.put(Input.Keys.S, ColorEntity.Type.BLUE);
+            keyPadMap.put(Input.Keys.DOWN, ColorEntity.Type.BLUE);
         }
 
         availableTiles = new ArrayList<>();
@@ -112,8 +119,10 @@ public class PlayScreen extends GameScreen implements Hand.HandListener {
             }
         }
 
-        Gem[] gems = gemSpawner.init();
-        for (Gem gem : gems) placeGem(gem);
+        gems = new ArrayList<>();
+
+        Gem[] startingGems = gemSpawner.init();
+        for (Gem gem : startingGems) placeGem(gem);
 
         font = new BitmapFont();
     }
@@ -123,6 +132,7 @@ public class PlayScreen extends GameScreen implements Hand.HandListener {
         int index = random.nextInt(availableTiles.size());
         Tile tile = availableTiles.remove(index);
         tile.setGem(gem);
+        gems.add(gem);
     }
 
     private void updateCurrentTile() {
@@ -143,14 +153,16 @@ public class PlayScreen extends GameScreen implements Hand.HandListener {
         currentTile = null;
     }
 
-    @Override
-    public void onGrabbedGem(Tile tile) {
-        availableTiles.add(tile);
+    private Pad getPad(ColorEntity.Type type) {
+        for (Pad pad : pads) {
+            if (pad.type == type) return pad;
+        }
+        return null;
     }
 
     @Override
-    public void onScored(int score) {
-        this.score += score;
+    public void onScored(int points) {
+        score += points;
     }
 
     @Override
@@ -158,23 +170,33 @@ public class PlayScreen extends GameScreen implements Hand.HandListener {
         unproject();
         updateCurrentTile();
 
-        if (ignoreInput) return;
-        keyHandMap.forEach((k, v) -> {
-            if (Gdx.input.isKeyJustPressed(k)) {
-                if (currentTile != null) {
-                    for (Hand hand : hands) {
-                        if (hand.type == v) {
-                            hand.grab(currentTile);
-                        }
-                    }
-                }
-            }
-        });
-
         if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
             TransitionScreen screen = new FadeTransitionScreen(context, new PlayScreen(context, difficulty));
             screen.duration = 1f;
             context.gsm.push(screen);
+        }
+
+        if (stage == Stage.PLAYING) {
+            keyPadMap.forEach((k, v) -> {
+                if (Gdx.input.isKeyJustPressed(k)) {
+                    if (currentTile != null) {
+                        Gem gem = currentTile.takeGem();
+                        System.out.println("takegem: " + gem);
+                        if (gem != null) {
+                            Pad pad = getPad(v);
+                            if (pad != null) {
+                                System.out.println("taking gem to pad: " + pad.type);
+                                System.out.println("gem is at " + gem.p + ", pad is at: " + pad.p);
+                                gem.collect(pad.p);
+                                System.out.println("gem d is at " + gem.d);
+                                availableTiles.add(gem.tile);
+                            }
+                        }
+                    }
+                }
+            });
+        } else if (stage == Stage.FINISH) {
+
         }
     }
 
@@ -183,22 +205,15 @@ public class PlayScreen extends GameScreen implements Hand.HandListener {
         handleInput();
 
         time += dt;
-        if (time >= 10) {
-            for (Hand hand : hands) {
-                hand.boost = true;
-            }
-        }
 
-        for (int i = 0; i < pads.length; i++) {
-            pads[i].update(dt);
-            hands[i].update(dt);
+        for (Gem gem : gems) {
+            gem.update(dt);
         }
+        gems.removeIf(it -> it.remove);
 
         if (stage == Stage.COUNTDOWN) {
-            ignoreInput = true;
             if (time >= 3f) {
                 time = 0f;
-                ignoreInput = false;
                 stage = Stage.PLAYING;
             }
         } else if (stage == Stage.PLAYING) {
@@ -211,7 +226,6 @@ public class PlayScreen extends GameScreen implements Hand.HandListener {
                 }
             }
             if (time >= 20) {
-                ignoreInput = true;
                 stage = Stage.FINISH;
             }
         }
@@ -226,18 +240,24 @@ public class PlayScreen extends GameScreen implements Hand.HandListener {
             b.draw(pixel, 0, 0, Constants.WIDTH, Constants.HEIGHT);
 
             b.setColor(1, 1, 1, 1);
-            for (int i = 0; i < pads.length; i++) {
-                pads[i].render(b);
-                hands[i].render(b);
+            for (Pad pad : pads) {
+                pad.render(b);
             }
             for (int row = 0; row < tiles.length; row++) {
                 for (int col = 0; col < tiles[row].length; col++) {
                     tiles[row][col].render(b);
                 }
             }
+            for (Gem gem : gems) {
+                gem.render(b);
+            }
 
             b.setColor(1, 1, 1, 1);
             font.draw(b, score + "", Constants.WIDTH * 0.05f, Constants.HEIGHT * 0.95f);
+
+            if (stage == Stage.PLAYING) {
+                font.draw(b, (20 - time) + "", Constants.WIDTH * 0.05f, Constants.HEIGHT * 0.05f);
+            }
         }
         b.end();
     }

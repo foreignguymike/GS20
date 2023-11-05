@@ -17,6 +17,8 @@ public class Context {
     public final GameScreenManager gsm;
     public final Batch b;
 
+    public boolean babyMode = false;
+
     public Context() {
         assetManager = new AssetManager();
         assetManager.load(ATLAS_NAME, TextureAtlas.class);

@@ -12,7 +12,7 @@ public class GemSnag20 extends ApplicationAdapter {
     @Override
     public void create() {
         context = new Context();
-        context.gsm.push(new PlayScreen(context, PlayScreen.Difficulty.NORMAL));
+        context.gsm.push(new PlayScreen(context, PlayScreen.Difficulty.CHALLENGE));
     }
 
     @Override
