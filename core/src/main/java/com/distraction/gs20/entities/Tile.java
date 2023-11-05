@@ -9,7 +9,9 @@ public class Tile extends Entity {
 
     private final TextureRegion pixel;
 
-    public Gem gem;
+    private Gem gem;
+
+    public boolean highlight;
 
     public Tile(Context context) {
         pixel = context.getImage("pixel");
@@ -22,6 +24,12 @@ public class Tile extends Entity {
         gem.p.set(p);
     }
 
+    public Gem takeGem() {
+        Gem gem1 = gem;
+        gem = null;
+        return gem1;
+    }
+
     @Override
     public void render(Batch b) {
         b.setColor(Constants.TILE_COLOR);
@@ -29,6 +37,10 @@ public class Tile extends Entity {
         b.draw(pixel, sleft(), sbottom(), 1f, sheight());
         b.draw(pixel, sleft(), stop(), swidth(), 1f);
         b.draw(pixel, sright(), sbottom(), 1f, sheight());
+        if (highlight) {
+            b.setColor(Constants.TILE_HIGHLIGHT_COLOR);
+            b.draw(pixel, sleft(), sbottom(), swidth(), sheight());
+        }
 
         if (gem != null) {
             gem.render(b);

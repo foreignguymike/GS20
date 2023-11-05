@@ -3,6 +3,7 @@ package com.distraction.gs20.screens;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.math.Vector2;
 import com.distraction.gs20.Context;
 import com.distraction.gs20.entities.ColorEntity;
@@ -19,17 +20,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-public class PlayScreen extends GameScreen {
+public class PlayScreen extends GameScreen implements Hand.HandListener {
 
     private enum Stage {
         COUNTDOWN,
-        PLAYING
+        PLAYING,
+        FINISH
     }
 
     public enum Difficulty {
         EASY,
         NORMAL,
-        WEIRD
+        CHALLENGE
     }
 
     private final Map<ColorEntity.Type, Vector2> PAD_POSITIONS = new HashMap<>() {{
@@ -52,6 +54,12 @@ public class PlayScreen extends GameScreen {
     private final Tile[][] tiles;
     private final List<Tile> availableTiles;
 
+    private float time;
+    private Tile currentTile;
+
+    private int score;
+    private BitmapFont font;
+
     public PlayScreen(Context context, Difficulty difficulty) {
         super(context);
 
@@ -64,17 +72,22 @@ public class PlayScreen extends GameScreen {
         List<ColorEntity.Type> types = new ArrayList<>();
         types.add(ColorEntity.Type.GREEN);
         keyHandMap.put(Input.Keys.D, ColorEntity.Type.GREEN);
+        keyHandMap.put(Input.Keys.RIGHT, ColorEntity.Type.GREEN);
         types.add(ColorEntity.Type.YELLOW);
         keyHandMap.put(Input.Keys.A, ColorEntity.Type.YELLOW);
+        keyHandMap.put(Input.Keys.LEFT, ColorEntity.Type.YELLOW);
         if (difficulty == Difficulty.NORMAL) {
             types.add(ColorEntity.Type.RED);
             keyHandMap.put(Input.Keys.W, ColorEntity.Type.RED);
+            keyHandMap.put(Input.Keys.UP, ColorEntity.Type.RED);
         }
-        if (difficulty == Difficulty.WEIRD) {
+        if (difficulty == Difficulty.CHALLENGE) {
             types.add(ColorEntity.Type.RED);
             keyHandMap.put(Input.Keys.W, ColorEntity.Type.RED);
+            keyHandMap.put(Input.Keys.UP, ColorEntity.Type.RED);
             types.add(ColorEntity.Type.BLUE);
             keyHandMap.put(Input.Keys.S, ColorEntity.Type.BLUE);
+            keyHandMap.put(Input.Keys.DOWN, ColorEntity.Type.BLUE);
         }
         pads = new Pad[types.size()];
         hands = new Hand[types.size()];
@@ -82,7 +95,7 @@ public class PlayScreen extends GameScreen {
             ColorEntity.Type type = types.get(i);
             pads[i] = new Pad(context, type);
             pads[i].p.set(PAD_POSITIONS.get(type));
-            hands[i] = new Hand(context, type);
+            hands[i] = new Hand(context, type, this);
             hands[i].setBasePosition(PAD_POSITIONS.get(type));
         }
 
@@ -101,6 +114,8 @@ public class PlayScreen extends GameScreen {
 
         Gem[] gems = gemSpawner.init();
         for (Gem gem : gems) placeGem(gem);
+
+        font = new BitmapFont();
     }
 
     private void placeGem(Gem gem) {
@@ -110,25 +125,69 @@ public class PlayScreen extends GameScreen {
         tile.setGem(gem);
     }
 
+    private void updateCurrentTile() {
+        for (int row = 0; row < tiles.length; row++) {
+            for (int col = 0; col < tiles[row].length; col++) {
+                if (tiles[row][col].contains(m.x, m.y)) {
+                    Tile newTile = tiles[row][col];
+                    if (currentTile != newTile && currentTile != null) {
+                        currentTile.highlight = false;
+                    }
+                    currentTile = newTile;
+                    newTile.highlight = true;
+                    return;
+                }
+            }
+        }
+        if (currentTile != null) currentTile.highlight = false;
+        currentTile = null;
+    }
+
+    @Override
+    public void onGrabbedGem(Tile tile) {
+        availableTiles.add(tile);
+    }
+
+    @Override
+    public void onScored(int score) {
+        this.score += score;
+    }
+
     @Override
     protected void handleInput() {
-        if (ignoreInput) return;
-
         unproject();
+        updateCurrentTile();
+
+        if (ignoreInput) return;
         keyHandMap.forEach((k, v) -> {
             if (Gdx.input.isKeyJustPressed(k)) {
-                for (Hand hand : hands) {
-                    if (hand.type == v) {
-                        hand.grab(m);
+                if (currentTile != null) {
+                    for (Hand hand : hands) {
+                        if (hand.type == v) {
+                            hand.grab(currentTile);
+                        }
                     }
                 }
             }
         });
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
+            TransitionScreen screen = new FadeTransitionScreen(context, new PlayScreen(context, difficulty));
+            screen.duration = 1f;
+            context.gsm.push(screen);
+        }
     }
 
     @Override
     public void update(float dt) {
         handleInput();
+
+        time += dt;
+        if (time >= 10) {
+            for (Hand hand : hands) {
+                hand.boost = true;
+            }
+        }
 
         for (int i = 0; i < pads.length; i++) {
             pads[i].update(dt);
@@ -136,11 +195,24 @@ public class PlayScreen extends GameScreen {
         }
 
         if (stage == Stage.COUNTDOWN) {
-            stage = Stage.PLAYING;
+            ignoreInput = true;
+            if (time >= 3f) {
+                time = 0f;
+                ignoreInput = false;
+                stage = Stage.PLAYING;
+            }
         } else if (stage == Stage.PLAYING) {
-            Gem gem = gemSpawner.take(dt);
-            if (gem != null) {
-                placeGem(gem);
+            while (true) {
+                Gem gem = gemSpawner.take(dt);
+                if (gem != null) {
+                    placeGem(gem);
+                } else {
+                    break;
+                }
+            }
+            if (time >= 20) {
+                ignoreInput = true;
+                stage = Stage.FINISH;
             }
         }
     }
@@ -163,6 +235,9 @@ public class PlayScreen extends GameScreen {
                     tiles[row][col].render(b);
                 }
             }
+
+            b.setColor(1, 1, 1, 1);
+            font.draw(b, score + "", Constants.WIDTH * 0.05f, Constants.HEIGHT * 0.95f);
         }
         b.end();
     }

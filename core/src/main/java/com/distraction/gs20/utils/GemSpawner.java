@@ -12,102 +12,104 @@ import java.util.Random;
 
 /**
  * 5 gems at the start.
- * Spawn new gem every 0.5 seconds for the first 10 seconds.
- * Then every 0.25 seconds for the last 10 seconds.
- * 5 + 20 + 40 - 1 (last one won't spawn) = 64 gems
  * In order to try to keep scoring fair, I'll have a pre-defined set that is shuffled.
  */
 public class GemSpawner {
 
     private static final Map<PlayScreen.Difficulty, int[]> ORDERS;
-    private static final float[] INTERVALS;
+    private static final Map<PlayScreen.Difficulty, float[]> INTERVALS;
 
     static {
-        ORDERS = new HashMap<>() {{
-            put(PlayScreen.Difficulty.EASY, new int[]{
-                0, 1, 1, 0,
-                1, 0, 1, 0,
-                0, 1, 0, 0,
-                1, 0, 1, 1,
-                0, 0, 1, 0,
-                1, 0, 1, 1,
-                0, 0, 1, 1,
-                1, 0, 1, 0,
-                1, 1, 0, 0,
-                0, 1, 0, 0,
-                1, 1, 0, 1,
-                1, 0, 0, 0,
-                1, 0, 1, 1,
-                0, 1, 1, 0,
-                1, 1, 0, 0,
-                1, 0, 0, 1
-            });
-            put(PlayScreen.Difficulty.NORMAL, new int[]{
-                0, 2, 1, 2,
-                0, 1, 2, 0,
-                2, 1, 1, 0,
-                1, 2, 0, 2,
-                0, 0, 1, 2,
-                1, 1, 2, 0,
-                2, 1, 2, 0,
-                1, 2, 0, 1,
-                0, 0, 1, 2,
-                0, 1, 2, 0,
-                2, 1, 1, 0,
-                1, 2, 0, 1,
-                0, 2, 1, 2,
-                0, 1, 2, 0,
-                2, 1, 1, 0,
-                1, 2, 0, 2
-            });
-            put(PlayScreen.Difficulty.WEIRD, new int[]{
-                0, 2, 1, 3,
-                2, 1, 3, 0,
-                3, 1, 2, 0,
-                1, 3, 0, 2,
-                0, 2, 1, 3,
-                2, 1, 3, 0,
-                3, 1, 2, 0,
-                1, 3, 0, 2,
-                0, 2, 1, 3,
-                2, 1, 3, 0,
-                3, 1, 2, 0,
-                1, 3, 0, 2,
-                0, 2, 1, 3,
-                2, 1, 3, 0,
-                3, 1, 2, 0,
-                1, 3, 0, 2
-            });
-        }};
-        INTERVALS = new float[]{
+        ORDERS = new HashMap<>();
+        ORDERS.put(PlayScreen.Difficulty.EASY, new int[]{
+            0, 1, 1, 0,
+            1, 0, 1, 0,
+            0, 1, 0, 0,
+            1, 0, 1, 1,
+            0, 0
+        });
+        ORDERS.put(PlayScreen.Difficulty.NORMAL, new int[]{
+            0, 2, 1, 2,
+            0, 1, 2, 0,
+            2, 0, 1, 0,
+            1, 2, 0, 1,
+            2, 1, 0, 2,
+            1, 0, 2, 0,
+            2, 1, 2, 0,
+            1, 2, 0, 1,
+            0, 1, 2, 1,
+            0, 2, 1, 0,
+            2, 1, 2, 0,
+            1, 2, 0, 1,
+            1, 2, 0, 1,
+            2, 1, 0, 1,
+            2, 0, 1, 2
+        });
+        ORDERS.put(PlayScreen.Difficulty.CHALLENGE, new int[]{
+            0, 2, 1, 3,
+            2, 1, 3, 0,
+            3, 1, 2, 0,
+            1, 3, 0, 2,
+            0, 2, 1, 3,
+            2, 1, 3, 0,
+            3, 1, 2, 0,
+            1, 3, 0, 2,
+            0, 2, 1, 3,
+            2, 1, 3, 0,
+            3, 1, 2, 0,
+            1, 3, 0, 2,
+            0, 2, 1, 3,
+            2, 1, 3, 0,
+            3, 1, 2, 0,
+            1, 3, 0, 2
+        });
+        INTERVALS = new HashMap<>();
+        INTERVALS.put(PlayScreen.Difficulty.EASY, new float[]{
             0f, 0f, 0f, 0f,
-            0f, 0.5f, 1f, 1.5f,
-            2f, 2.5f, 3f, 3.5f,
-            4f, 4.5f, 5f, 5.5f,
-            6f, 6.5f, 7f, 7.5f,
-            8f, 8.5f, 9f, 9.5f,
-            10f, 10.25f, 10.5f, 10.75f,
-            11f, 11.25f, 11.5f, 11.75f,
-            12f, 12.25f, 12.5f, 12.75f,
-            13f, 13.25f, 13.5f, 13.75f,
-            14f, 14.25f, 14.5f, 14.75f,
-            15f, 15.25f, 15.5f, 15.75f,
-            16f, 16.25f, 16.5f, 16.75f,
-            17f, 17.25f, 17.5f, 17.75f,
-            18f, 18.25f, 18.5f, 18.75f,
-            19f, 19.25f, 19.5f, 19.75f,
-        };
+            0f, 2f, 4f, 8f,
+            10f, 11f, 12f, 13f,
+            14f, 15f, 16f, 17f,
+            18f, 19f
+        });
+        INTERVALS.put(PlayScreen.Difficulty.NORMAL, new float[]{
+            0f, 0f, 0f, 0f,
+            0f, 1f, 2f, 2f,
+            3f, 4f, 4f, 5f,
+            6f, 6f, 7f, 8f,
+            8f, 9f, 10f, 10f, 10.5f,
+            11f, 11.5f, 12f, 12f, 12.5f,
+            13f, 13.5f, 14f, 14f, 14.5f,
+            15f, 15.5f, 16f, 16f, 16.5f,
+            17f, 17.5f, 18f, 18f, 18.5f,
+            19f, 19.5f
+        });
+        INTERVALS.put(PlayScreen.Difficulty.CHALLENGE, new float[]{
+            0f, 0f, 0f, 0f,
+            0f, 1f, 2f, 2f,
+            3f, 4f, 5f, 5f,
+            6f, 7f, 8f, 8f,
+            9f, 10f,
+            10.4f, 10.8f, 11.2f, 11.6f,
+            12f, 12.4f, 12.8f, 13.2f,
+            13.6f, 14f, 14.4f, 14.8f,
+            15.2f, 15.6f, 16f, 16.4f,
+            16.8f, 17.2f, 17.6f, 18f,
+            18.4f, 18.8f, 19.2f, 19.6f
+        });
     }
 
     private final Context context;
+    private final PlayScreen.Difficulty difficulty;
 
     private final int[] order;
+    private final float[] interval;
     private final int[] shuffle;
     private final boolean[] taken;
     private float time = 0f;
 
     public GemSpawner(Context context, PlayScreen.Difficulty difficulty) {
         this.context = context;
+        this.difficulty = difficulty;
 
         if (difficulty == PlayScreen.Difficulty.EASY) {
             shuffle = new int[]{1, 3};
@@ -121,6 +123,7 @@ public class GemSpawner {
         shuffleArray(shuffle);
 
         order = ORDERS.get(difficulty);
+        interval = INTERVALS.get(difficulty);
         taken = new boolean[order.length];
         Arrays.fill(taken, false);
     }
@@ -137,12 +140,16 @@ public class GemSpawner {
 
     public Gem take(float dt) {
         time += dt;
-        for (int i = INTERVALS.length - 1; i >= 0; i--) {
-            if (time >= INTERVALS[i] && !taken[i]) {
+        for (int i = interval.length - 1; i >= 0; i--) {
+            if (time >= interval[i] && !taken[i]) {
                 taken[i] = true;
                 ColorEntity.Type type = ColorEntity.Type.values()[shuffle[order[i]]];
-                Gem.Size size = i % 11 == 0 ? Gem.Size.LARGE : i % 5 == 0 ? Gem.Size.MEDIUM : Gem.Size.SMALL;
-                return new Gem(context, type, size);
+                Gem.Size size;
+                if (i == 0) size = Gem.Size.SMALL;
+                else if (i % 11 == 0) size = Gem.Size.LARGE;
+                else if (i % 5 == 0) size = Gem.Size.MEDIUM;
+                else size = Gem.Size.SMALL;
+                return new Gem(context, type, size, difficulty);
             }
         }
         return null;

@@ -18,5 +18,6 @@ public class Constants {
 
     public static final Color BG_COLOR = Color.valueOf("393457");
     public static final Color TILE_COLOR = Color.valueOf("606C81");
+    public static final Color TILE_HIGHLIGHT_COLOR = new Color(1, 1, 1, 0.3f);
 
 }

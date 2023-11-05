@@ -3,6 +3,7 @@ package com.distraction.gs20.entities;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.distraction.gs20.Context;
+import com.distraction.gs20.screens.PlayScreen;
 
 public class Gem extends ColorEntity {
 
@@ -23,12 +24,24 @@ public class Gem extends ColorEntity {
     private final TextureRegion image;
 
     public final Size size;
+    public final PlayScreen.Difficulty difficulty;
 
-    public Gem(Context context, Type type, Size size) {
+    public Gem(Context context, Type type, Size size, PlayScreen.Difficulty difficulty) {
         super(type);
         this.size = size;
+        this.difficulty = difficulty;
 
-        image = context.getImage(type.name + size.name);
+        String name = type.name + size.name;
+
+        image = context.getImage(name);
+    }
+
+    public int getPoints() {
+        if (difficulty == PlayScreen.Difficulty.CHALLENGE) {
+            return size.score;
+        } else {
+            return 100;
+        }
     }
 
     @Override
