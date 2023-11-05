@@ -1,13 +1,153 @@
 
 gs20.png
-size: 16,16
+size: 1024,64
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
+blue1
+  rotate: false
+  xy: 242, 5
+  size: 38, 38
+  orig: 38, 38
+  offset: 0, 0
+  index: -1
+blue2
+  rotate: false
+  xy: 282, 5
+  size: 38, 38
+  orig: 38, 38
+  offset: 0, 0
+  index: -1
+blue3
+  rotate: false
+  xy: 322, 5
+  size: 38, 38
+  orig: 38, 38
+  offset: 0, 0
+  index: -1
+bluehand
+  rotate: false
+  xy: 515, 12
+  size: 31, 31
+  orig: 31, 31
+  offset: 0, 0
+  index: -1
+bluepad
+  rotate: false
+  xy: 713, 12
+  size: 31, 31
+  orig: 31, 31
+  offset: 0, 0
+  index: -1
+green1
+  rotate: false
+  xy: 122, 5
+  size: 38, 38
+  orig: 38, 38
+  offset: 0, 0
+  index: -1
+green2
+  rotate: false
+  xy: 162, 5
+  size: 38, 38
+  orig: 38, 38
+  offset: 0, 0
+  index: -1
+green3
+  rotate: false
+  xy: 202, 5
+  size: 38, 38
+  orig: 38, 38
+  offset: 0, 0
+  index: -1
+greenhand
+  rotate: false
+  xy: 680, 12
+  size: 31, 31
+  orig: 31, 31
+  offset: 0, 0
+  index: -1
+greenpad
+  rotate: false
+  xy: 647, 12
+  size: 31, 31
+  orig: 31, 31
+  offset: 0, 0
+  index: -1
 pixel
   rotate: false
   xy: 2, 2
   size: 1, 1
   orig: 1, 1
+  offset: 0, 0
+  index: -1
+red1
+  rotate: false
+  xy: 2, 5
+  size: 38, 38
+  orig: 38, 38
+  offset: 0, 0
+  index: -1
+red2
+  rotate: false
+  xy: 42, 5
+  size: 38, 38
+  orig: 38, 38
+  offset: 0, 0
+  index: -1
+red3
+  rotate: false
+  xy: 82, 5
+  size: 38, 38
+  orig: 38, 38
+  offset: 0, 0
+  index: -1
+redhand
+  rotate: false
+  xy: 482, 12
+  size: 31, 31
+  orig: 31, 31
+  offset: 0, 0
+  index: -1
+redpad
+  rotate: false
+  xy: 581, 12
+  size: 31, 31
+  orig: 31, 31
+  offset: 0, 0
+  index: -1
+yellow1
+  rotate: false
+  xy: 362, 5
+  size: 38, 38
+  orig: 38, 38
+  offset: 0, 0
+  index: -1
+yellow2
+  rotate: false
+  xy: 402, 5
+  size: 38, 38
+  orig: 38, 38
+  offset: 0, 0
+  index: -1
+yellow3
+  rotate: false
+  xy: 442, 5
+  size: 38, 38
+  orig: 38, 38
+  offset: 0, 0
+  index: -1
+yellowhand
+  rotate: false
+  xy: 614, 12
+  size: 31, 31
+  orig: 31, 31
+  offset: 0, 0
+  index: -1
+yellowpad
+  rotate: false
+  xy: 548, 12
+  size: 31, 31
+  orig: 31, 31
   offset: 0, 0
   index: -1
