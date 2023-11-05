@@ -18,7 +18,7 @@ public class TitleScreen extends GameScreen {
         if (ignoreInput) return;
         if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
             TransitionScreen screen = new FadeTransitionScreen(context, new PlayScreen(context));
-            screen.setDuration(2f);
+            screen.duration = 2f;
             context.gsm.push(screen);
         }
     }

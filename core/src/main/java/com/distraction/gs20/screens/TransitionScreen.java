@@ -6,8 +6,9 @@ public abstract class TransitionScreen extends GameScreen {
 
     protected final GameScreen nextScreen;
 
-    protected int pop = 1;
-    protected float duration = 0.5f;
+    public int pop = 1;
+    public float duration = 0.5f;
+
     protected float time = 0f;
     protected boolean next = false;
 
@@ -16,14 +17,6 @@ public abstract class TransitionScreen extends GameScreen {
         this.nextScreen = nextScreen;
 
         context.gsm.depth++;
-    }
-
-    public void setDuration(float duration) {
-        this.duration = duration;
-    }
-
-    public void setPop(int pop) {
-        this.pop = pop;
     }
 
     @Override
