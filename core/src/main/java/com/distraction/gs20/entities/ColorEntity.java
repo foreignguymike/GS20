@@ -8,7 +8,7 @@ public abstract class ColorEntity extends Entity {
         BLUE("blue"),
         YELLOW("yellow");
 
-        public String name;
+        public final String name;
 
         Type(String name) {
             this.name = name;

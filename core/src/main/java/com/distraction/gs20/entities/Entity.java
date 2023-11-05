@@ -94,8 +94,16 @@ public abstract class Entity {
         return p.x + s.x / 2f;
     }
 
+    public float sright() {
+        return p.x + scale * s.x / 2f;
+    }
+
     public float top() {
         return p.y + s.y / 2f;
+    }
+
+    public float stop() {
+        return p.y + scale * s.y / 2f;
     }
 
     public float bottom() {
@@ -134,6 +142,10 @@ public abstract class Entity {
     }
 
     public void render(Batch b) {
+    }
+
+    protected void basicRender(Batch b, TextureRegion image) {
+        b.draw(image, sleft(image), sbottom(image), swidth(image), sheight(image));
     }
 
 }
