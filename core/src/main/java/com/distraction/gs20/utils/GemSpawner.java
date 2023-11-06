@@ -91,16 +91,18 @@ public class GemSpawner {
         });
         INTERVALS.put(PlayScreen.Difficulty.CHALLENGE, new float[]{
             0f, 0f, 0f, 0f,
-            0f, 1f, 2f, 2f,
-            3f, 4f, 4f, 5f,
-            5f, 6f, 6f, 7f,
-            7f, 8f, 8f, 9f,
-            9f, 9f, 10f, 10f,
+            0f, 1f, 1f, 2f,
+            2f, 3f, 3f, 4f,
+            4f, 5f, 5f, 6f,
+            6f, 6.5f, 7f, 7f,
+            8f, 8f, 9f, 9f,
+            9f, 9.5f, 10f, 10f,
             10.4f, 10.8f, 11.2f, 11.6f,
             12f, 12.4f, 12.8f, 13.2f,
             13.6f, 14f, 14.4f, 14.8f,
-            15.2f, 15.6f, 16f, 16.4f,
-            16.8f, 17.2f, 17.6f, 18f,
+            15.0f, 15.2f, 15.6f, 16f,
+            16.2f, 16.4f, 16.8f, 17.0f,
+            17.2f, 17.6f, 18f, 18.2f,
             18.4f, 18.8f, 19.2f, 19.6f
         });
     }

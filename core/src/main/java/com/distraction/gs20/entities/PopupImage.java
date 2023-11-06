@@ -26,6 +26,7 @@ public class PopupImage extends Entity {
         if (!start) return;
         timer += dt;
         if (timer < 0.5f) {
+            alpha = timer * 4f;
             scale = MathUtils.map(0, 0.5f, 10f, -10f, timer);
             if (scale < 1) scale = 1;
         } else if (timer < 1f) {

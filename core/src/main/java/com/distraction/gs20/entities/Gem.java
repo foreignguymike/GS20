@@ -13,6 +13,7 @@ public class Gem extends ColorEntity {
     }
 
     public enum Size {
+        ARROW("a", 100),
         SMALL("1", 100),
         MEDIUM("2", 250),
         LARGE("3", 500);
@@ -28,7 +29,6 @@ public class Gem extends ColorEntity {
 
     private static final float SPEED = Constants.WIDTH * 3f;
 
-    private final Context context;
     private final TextureRegion image;
 
     public final Size size;
@@ -41,13 +41,11 @@ public class Gem extends ColorEntity {
 
     public Gem(Context context, Type type, Size size, PlayScreen.Difficulty difficulty, GemListener listener) {
         super(type);
-        this.context = context;
-        this.size = size;
+        this.size = context.babyMode ? Size.ARROW : size;
         this.difficulty = difficulty;
         this.listener = listener;
 
         String name = type.name + size.name;
-        if (context.babyMode) name += "a";
 
         image = context.getImage(name);
         scale = 0;
@@ -59,8 +57,8 @@ public class Gem extends ColorEntity {
     }
 
     public int getPoints() {
-        if (context.babyMode) {
-            return 100;
+        if (size == Size.ARROW) {
+            return size.points;
         } else {
             return size.points + difficulty.points;
         }

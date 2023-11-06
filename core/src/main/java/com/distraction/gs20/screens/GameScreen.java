@@ -23,6 +23,11 @@ public abstract class GameScreen {
     protected MyViewport viewport;
 
     /**
+     * UI Camera.
+     */
+    protected MyViewport uiViewport;
+
+    /**
      * Current mouse position.
      */
     protected Vector2 m = new Vector2();
@@ -32,6 +37,7 @@ public abstract class GameScreen {
     protected GameScreen(Context context) {
         this.context = context;
         viewport = new MyViewport(Constants.WIDTH, Constants.HEIGHT);
+        uiViewport = new MyViewport(Constants.WIDTH, Constants.HEIGHT);
 
         pixel = context.getImage("pixel");
     }
@@ -44,6 +50,7 @@ public abstract class GameScreen {
 
     public void resize(int width, int height) {
         viewport.update(width, height);
+        uiViewport.update(width, height);
     }
 
     /**

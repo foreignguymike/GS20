@@ -59,21 +59,14 @@ public class Tile extends Entity {
 
     @Override
     public void render(Batch b) {
-        b.setColor(Constants.BG_COLOR);
-        b.draw(pixel, sleft() + 1, sbottom() + 1, swidth() - 1, sheight() - 1);
-        b.setColor(Constants.TILE_COLOR);
-        b.draw(pixel, sleft(), sbottom(), swidth(), 1f);
-        b.draw(pixel, sleft(), sbottom(), 1f, sheight());
-        b.draw(pixel, sleft(), stop(), swidth(), 1f);
-        b.draw(pixel, sright(), sbottom(), 1f, sheight() + 1);
         if (flashColor != null) {
             b.setColor(flashColor);
             Utils.setAlpha(b, FLASH_TIME - time / FLASH_TIME);
-            b.draw(pixel, sleft() + 1, sbottom() + 1, swidth() - 1, sheight() - 1);
+            b.draw(pixel, sleft() + 1, sbottom() + 1, swidth() - 2, sheight() - 2);
         }
         if (highlight) {
             b.setColor(Constants.TILE_HIGHLIGHT_COLOR);
-            b.draw(pixel, sleft(), sbottom(), swidth(), sheight());
+            b.draw(pixel, sleft() + 1, sbottom() + 1, swidth() - 2, sheight() - 2);
         }
     }
 }

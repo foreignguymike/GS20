@@ -2,9 +2,9 @@ package com.distraction.gs20.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.distraction.gs20.Context;
 import com.distraction.gs20.entities.ColorEntity;
@@ -26,7 +26,8 @@ public class PlayScreen extends GameScreen implements Gem.GemListener {
     private enum Stage {
         COUNTDOWN,
         PLAYING,
-        FINISH
+        FINISH,
+        LAST
     }
 
     public enum Difficulty {
@@ -47,6 +48,8 @@ public class PlayScreen extends GameScreen implements Gem.GemListener {
         put(ColorEntity.Type.BLUE, new Vector2(Constants.WIDTH * 0.5f, Constants.HEIGHT * 0.0703f));
         put(ColorEntity.Type.YELLOW, new Vector2(Constants.WIDTH * 0.0703f, Constants.HEIGHT * 0.5f));
     }};
+
+    private TextureRegion bg;
 
     private final Map<Integer, ColorEntity.Type> keyPadMap;
 
@@ -71,8 +74,9 @@ public class PlayScreen extends GameScreen implements Gem.GemListener {
 
     public PlayScreen(Context context, Difficulty difficulty) {
         super(context);
-
         this.difficulty = difficulty;
+
+        bg = context.getImage("bg");
 
         gemSpawner = new GemSpawner(context, difficulty, this);
         random = new Random();
@@ -185,6 +189,8 @@ public class PlayScreen extends GameScreen implements Gem.GemListener {
         unproject();
         updateCurrentTile();
 
+        if (ignoreInput) return;
+
         if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
             TransitionScreen screen = new FadeTransitionScreen(context, new PlayScreen(context, difficulty));
             screen.duration = 1f;
@@ -207,6 +213,11 @@ public class PlayScreen extends GameScreen implements Gem.GemListener {
                     }
                 }
             });
+            if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
+                time = 0f;
+                stage = Stage.FINISH;
+                countdownImages[4].start();
+            }
         } else if (stage == Stage.FINISH) {
 
         }
@@ -249,11 +260,19 @@ public class PlayScreen extends GameScreen implements Gem.GemListener {
             }
             for (PopupImage image : countdownImages) image.update(dt);
             if (time > 20) {
+                time = 0f;
                 stage = Stage.FINISH;
                 countdownImages[4].start();
             }
         } else if (stage == Stage.FINISH) {
+            time += dt;
             for (PopupImage image : countdownImages) image.update(dt);
+            if (time >= 1f) {
+                ignoreInput = true;
+                context.gsm.push(new FinishScreen(context, difficulty));
+                context.gsm.depth++;
+                stage = Stage.LAST;
+            }
         }
     }
 
@@ -262,8 +281,8 @@ public class PlayScreen extends GameScreen implements Gem.GemListener {
         b.setProjectionMatrix(viewport.getCamera().combined);
         b.begin();
         {
-            b.setColor(Color.BLACK);
-            b.draw(pixel, 0, 0, Constants.WIDTH, Constants.HEIGHT);
+            b.setColor(1, 1, 1, 1);
+            b.draw(bg, 0, 0);
 
             b.setColor(1, 1, 1, 1);
             for (Pad pad : pads) {

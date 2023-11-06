@@ -20,4 +20,10 @@ public class MyViewport extends FitViewport {
         getCamera().update();
     }
 
+    public void setY(float y) {
+        float x = getCamera().position.x;
+        getCamera().position.set(x, y, 0);
+        getCamera().update();
+    }
+
 }

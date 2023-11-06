@@ -7,7 +7,12 @@ import com.distraction.gs20.utils.Constants;
 public class FadeTransitionScreen extends TransitionScreen {
 
     public FadeTransitionScreen(Context context, GameScreen nextScreen) {
+        this(context, nextScreen, 1);
+    }
+
+    public FadeTransitionScreen(Context context, GameScreen nextScreen, int pop) {
         super(context, nextScreen);
+        this.pop = pop;
     }
 
     @Override

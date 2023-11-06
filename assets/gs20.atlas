@@ -1,271 +1,201 @@
 
 gs20.png
-size: 512,128
+size: 512,512
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
 1
   rotate: false
-  xy: 2, 2
-  size: 40, 40
-  orig: 40, 40
+  xy: 274, 309
+  size: 64, 64
+  orig: 64, 64
   offset: 0, 0
   index: -1
 2
   rotate: false
-  xy: 44, 2
-  size: 40, 40
-  orig: 40, 40
+  xy: 430, 375
+  size: 64, 64
+  orig: 64, 64
   offset: 0, 0
   index: -1
 3
   rotate: false
-  xy: 86, 2
-  size: 40, 40
-  orig: 40, 40
+  xy: 274, 243
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+bg
+  rotate: false
+  xy: 2, 235
+  size: 270, 270
+  orig: 270, 270
   offset: 0, 0
   index: -1
 blue1
   rotate: false
-  xy: 128, 6
+  xy: 380, 295
   size: 38, 38
   orig: 38, 38
   offset: 0, 0
   index: -1
 blue2
   rotate: false
-  xy: 147, 46
-  size: 38, 38
-  orig: 38, 38
-  offset: 0, 0
-  index: -1
-blue2a
-  rotate: false
-  xy: 316, 88
-  size: 38, 38
-  orig: 38, 38
-  offset: 0, 0
-  index: -1
-blue1a
-  rotate: false
-  xy: 316, 88
-  size: 38, 38
-  orig: 38, 38
-  offset: 0, 0
-  index: -1
-blue3a
-  rotate: false
-  xy: 316, 88
+  xy: 420, 335
   size: 38, 38
   orig: 38, 38
   offset: 0, 0
   index: -1
 blue3
   rotate: false
-  xy: 187, 48
+  xy: 224, 75
   size: 38, 38
   orig: 38, 38
   offset: 0, 0
   index: -1
-bluehand
+bluea
   rotate: false
-  xy: 387, 55
-  size: 31, 31
-  orig: 31, 31
+  xy: 340, 295
+  size: 38, 38
+  orig: 38, 38
   offset: 0, 0
   index: -1
 bluepad
   rotate: false
-  xy: 234, 15
+  xy: 373, 222
   size: 31, 31
   orig: 31, 31
   offset: 0, 0
   index: -1
+finishbg
+  rotate: false
+  xy: 2, 13
+  size: 220, 220
+  orig: 220, 220
+  offset: 0, 0
+  index: -1
 go
   rotate: false
-  xy: 2, 44
-  size: 103, 40
-  orig: 103, 40
+  xy: 274, 375
+  size: 154, 64
+  orig: 154, 64
   offset: 0, 0
   index: -1
 green1
   rotate: false
-  xy: 356, 88
+  xy: 380, 335
   size: 38, 38
   orig: 38, 38
   offset: 0, 0
   index: -1
 green2
   rotate: false
-  xy: 396, 88
-  size: 38, 38
-  orig: 38, 38
-  offset: 0, 0
-  index: -1
-green2a
-  rotate: false
-  xy: 276, 88
-  size: 38, 38
-  orig: 38, 38
-  offset: 0, 0
-  index: -1
-green1a
-  rotate: false
-  xy: 276, 88
-  size: 38, 38
-  orig: 38, 38
-  offset: 0, 0
-  index: -1
-green3a
-  rotate: false
-  xy: 276, 88
+  xy: 224, 115
   size: 38, 38
   orig: 38, 38
   offset: 0, 0
   index: -1
 green3
   rotate: false
-  xy: 436, 88
+  xy: 340, 255
   size: 38, 38
   orig: 38, 38
   offset: 0, 0
   index: -1
-greenhand
+greena
   rotate: false
-  xy: 201, 15
-  size: 31, 31
-  orig: 31, 31
+  xy: 460, 335
+  size: 38, 38
+  orig: 38, 38
   offset: 0, 0
   index: -1
 greenpad
   rotate: false
-  xy: 168, 13
+  xy: 340, 222
   size: 31, 31
   orig: 31, 31
   offset: 0, 0
   index: -1
 pixel
   rotate: false
-  xy: 509, 125
+  xy: 496, 438
   size: 1, 1
   orig: 1, 1
   offset: 0, 0
   index: -1
 red1
   rotate: false
-  xy: 156, 88
+  xy: 224, 195
   size: 38, 38
   orig: 38, 38
   offset: 0, 0
   index: -1
 red2
   rotate: false
-  xy: 107, 46
+  xy: 340, 335
   size: 38, 38
   orig: 38, 38
   offset: 0, 0
   index: -1
 red3
   rotate: false
-  xy: 196, 88
+  xy: 224, 155
   size: 38, 38
   orig: 38, 38
   offset: 0, 0
   index: -1
-red3a
+reda
   rotate: false
-  xy: 227, 48
+  xy: 224, 35
   size: 38, 38
   orig: 38, 38
-  offset: 0, 0
-  index: -1
-red1a
-  rotate: false
-  xy: 227, 48
-  size: 38, 38
-  orig: 38, 38
-  offset: 0, 0
-  index: -1
-red2a
-  rotate: false
-  xy: 227, 48
-  size: 38, 38
-  orig: 38, 38
-  offset: 0, 0
-  index: -1
-redhand
-  rotate: false
-  xy: 476, 95
-  size: 31, 31
-  orig: 31, 31
   offset: 0, 0
   index: -1
 redpad
   rotate: false
-  xy: 453, 55
+  xy: 224, 2
   size: 31, 31
   orig: 31, 31
   offset: 0, 0
   index: -1
 time
   rotate: false
-  xy: 2, 86
-  size: 152, 40
-  orig: 152, 40
+  xy: 274, 441
+  size: 234, 64
+  orig: 234, 64
   offset: 0, 0
   index: -1
 yellow1
   rotate: false
-  xy: 267, 48
-  size: 38, 38
-  orig: 38, 38
-  offset: 0, 0
-  index: -1
-yellow1a
-  rotate: false
-  xy: 236, 88
-  size: 38, 38
-  orig: 38, 38
-  offset: 0, 0
-  index: -1
-yellow2a
-  rotate: false
-  xy: 236, 88
-  size: 38, 38
-  orig: 38, 38
-  offset: 0, 0
-  index: -1
-yellow3a
-  rotate: false
-  xy: 236, 88
+  xy: 420, 255
   size: 38, 38
   orig: 38, 38
   offset: 0, 0
   index: -1
 yellow2
   rotate: false
-  xy: 307, 48
+  xy: 380, 255
   size: 38, 38
   orig: 38, 38
   offset: 0, 0
   index: -1
 yellow3
   rotate: false
-  xy: 347, 48
+  xy: 460, 295
   size: 38, 38
   orig: 38, 38
   offset: 0, 0
   index: -1
-yellowhand
+yellowa
   rotate: false
-  xy: 420, 55
-  size: 31, 31
-  orig: 31, 31
+  xy: 420, 295
+  size: 38, 38
+  orig: 38, 38
   offset: 0, 0
   index: -1
 yellowpad
   rotate: false
-  xy: 267, 15
+  xy: 460, 262
   size: 31, 31
   orig: 31, 31
   offset: 0, 0
