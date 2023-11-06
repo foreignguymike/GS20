@@ -2,6 +2,7 @@ package com.distraction.gs20.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.math.Vector2;
@@ -9,6 +10,7 @@ import com.distraction.gs20.Context;
 import com.distraction.gs20.entities.ColorEntity;
 import com.distraction.gs20.entities.Gem;
 import com.distraction.gs20.entities.Pad;
+import com.distraction.gs20.entities.PopupImage;
 import com.distraction.gs20.entities.Tile;
 import com.distraction.gs20.utils.Constants;
 import com.distraction.gs20.utils.GemSpawner;
@@ -29,8 +31,8 @@ public class PlayScreen extends GameScreen implements Gem.GemListener {
 
     public enum Difficulty {
         EASY(0),
-        NORMAL(50),
-        CHALLENGE(100);
+        NORMAL(100),
+        CHALLENGE(200);
 
         public final int points;
 
@@ -64,6 +66,8 @@ public class PlayScreen extends GameScreen implements Gem.GemListener {
 
     private int score;
     private BitmapFont font;
+
+    private PopupImage[] countdownImages;
 
     public PlayScreen(Context context, Difficulty difficulty) {
         super(context);
@@ -125,6 +129,17 @@ public class PlayScreen extends GameScreen implements Gem.GemListener {
         for (Gem gem : startingGems) placeGem(gem);
 
         font = new BitmapFont();
+
+        countdownImages = new PopupImage[]{
+            new PopupImage(context.getImage("3")),
+            new PopupImage(context.getImage("2")),
+            new PopupImage(context.getImage("1")),
+            new PopupImage(context.getImage("go")),
+            new PopupImage(context.getImage("time"))
+        };
+        for (PopupImage image : countdownImages) {
+            image.p.set(Constants.WIDTH * 0.5f, Constants.HEIGHT * 0.5f);
+        }
     }
 
     private void placeGem(Gem gem) {
@@ -181,15 +196,12 @@ public class PlayScreen extends GameScreen implements Gem.GemListener {
                 if (Gdx.input.isKeyJustPressed(k)) {
                     if (currentTile != null) {
                         Gem gem = currentTile.takeGem();
-                        System.out.println("takegem: " + gem);
                         if (gem != null) {
                             Pad pad = getPad(v);
                             if (pad != null) {
-                                System.out.println("taking gem to pad: " + pad.type);
-                                System.out.println("gem is at " + gem.p + ", pad is at: " + pad.p);
-                                gem.collect(pad.p);
-                                System.out.println("gem d is at " + gem.d);
+                                gem.collect(pad);
                                 availableTiles.add(gem.tile);
+                                gem.tile.flash(pad.type.color);
                             }
                         }
                     }
@@ -204,19 +216,29 @@ public class PlayScreen extends GameScreen implements Gem.GemListener {
     public void update(float dt) {
         handleInput();
 
-        time += dt;
-
         for (Gem gem : gems) {
             gem.update(dt);
         }
         gems.removeIf(it -> it.remove);
+        for (int row = 0; row < tiles.length; row++) {
+            for (int col = 0; col < tiles[row].length; col++) {
+                tiles[row][col].update(dt);
+            }
+        }
 
         if (stage == Stage.COUNTDOWN) {
-            if (time >= 3f) {
+            if (time > 3.75f) countdownImages[3].start();
+            else if (time > 2.75f) countdownImages[2].start();
+            else if (time > 1.75f) countdownImages[1].start();
+            else if (time > 0.75f) countdownImages[0].start();
+            time += dt;
+            if (time >= 4f) {
                 time = 0f;
                 stage = Stage.PLAYING;
             }
+            for (PopupImage image : countdownImages) image.update(dt);
         } else if (stage == Stage.PLAYING) {
+            time += dt;
             while (true) {
                 Gem gem = gemSpawner.take(dt);
                 if (gem != null) {
@@ -225,9 +247,13 @@ public class PlayScreen extends GameScreen implements Gem.GemListener {
                     break;
                 }
             }
-            if (time >= 20) {
+            for (PopupImage image : countdownImages) image.update(dt);
+            if (time > 20) {
                 stage = Stage.FINISH;
+                countdownImages[4].start();
             }
+        } else if (stage == Stage.FINISH) {
+            for (PopupImage image : countdownImages) image.update(dt);
         }
     }
 
@@ -236,7 +262,7 @@ public class PlayScreen extends GameScreen implements Gem.GemListener {
         b.setProjectionMatrix(viewport.getCamera().combined);
         b.begin();
         {
-            b.setColor(Constants.BG_COLOR);
+            b.setColor(Color.BLACK);
             b.draw(pixel, 0, 0, Constants.WIDTH, Constants.HEIGHT);
 
             b.setColor(1, 1, 1, 1);
@@ -258,6 +284,8 @@ public class PlayScreen extends GameScreen implements Gem.GemListener {
             if (stage == Stage.PLAYING) {
                 font.draw(b, (20 - time) + "", Constants.WIDTH * 0.05f, Constants.HEIGHT * 0.05f);
             }
+
+            for (PopupImage image : countdownImages) image.render(b);
         }
         b.end();
     }

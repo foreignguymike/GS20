@@ -1,17 +1,22 @@
 package com.distraction.gs20.entities;
 
+import com.badlogic.gdx.graphics.Color;
+import com.distraction.gs20.utils.Constants;
+
 public abstract class ColorEntity extends Entity {
 
     public enum Type {
-        RED("red"),
-        GREEN("green"),
-        BLUE("blue"),
-        YELLOW("yellow");
+        RED("red", Constants.RED),
+        GREEN("green", Constants.GREEN),
+        BLUE("blue", Constants.BLUE),
+        YELLOW("yellow", Constants.YELLOW);
 
         public final String name;
+        public final Color color;
 
-        Type(String name) {
+        Type(String name, Color color) {
             this.name = name;
+            this.color = color;
         }
     }
 

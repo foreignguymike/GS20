@@ -2,7 +2,6 @@ package com.distraction.gs20.entities;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Vector2;
 import com.distraction.gs20.Context;
 import com.distraction.gs20.screens.PlayScreen;
 import com.distraction.gs20.utils.Constants;
@@ -36,7 +35,9 @@ public class Gem extends ColorEntity {
     public final PlayScreen.Difficulty difficulty;
     public final GemListener listener;
     public Tile tile;
-    public boolean collecting;
+    public Pad pad;
+
+    private float time = 0f;
 
     public Gem(Context context, Type type, Size size, PlayScreen.Difficulty difficulty, GemListener listener) {
         super(type);
@@ -49,11 +50,12 @@ public class Gem extends ColorEntity {
         if (context.babyMode) name += "a";
 
         image = context.getImage(name);
+        scale = 0;
     }
 
-    public void collect(Vector2 dest) {
-        d.set(dest);
-        collecting = true;
+    public void collect(Pad pad) {
+        this.pad = pad;
+        d.set(pad.p);
     }
 
     public int getPoints() {
@@ -66,11 +68,18 @@ public class Gem extends ColorEntity {
 
     @Override
     public void update(float dt) {
+        time += dt;
+        scale = time / 0.1f;
+        if (scale > 1) scale = 1;
         if (!atDestination()) {
             setVectorFromDist(SPEED);
             move(dt);
-            if (atDestination() && collecting) {
-                listener.onScored(getPoints());
+            if (atDestination() && pad != null) {
+                int points = getPoints();
+                if (pad.type != type) {
+                    points = -points;
+                }
+                listener.onScored(points);
                 remove = true;
             }
         }

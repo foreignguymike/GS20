@@ -27,7 +27,9 @@ public class GemSpawner {
             0, 1, 0, 0,
             1, 0, 1, 1,
             0, 0, 1, 0,
-            1, 1, 0, 1
+            1, 1, 0, 1,
+            0, 1, 0, 0,
+            1, 0, 1, 0
         });
         ORDERS.put(PlayScreen.Difficulty.NORMAL, new int[]{
             0, 2, 1, 2,
@@ -67,8 +69,10 @@ public class GemSpawner {
         INTERVALS = new HashMap<>();
         INTERVALS.put(PlayScreen.Difficulty.EASY, new float[]{
             0f, 0f, 0f, 0f,
-            0f, 2f, 4f, 6f,
-            8f, 10f, 10f, 11f,
+            0f, 1f, 2f, 2f,
+            4f, 4f, 5f, 6f,
+            6f, 7f, 8f, 8f,
+            9f, 10f, 10f, 11f,
             12f, 12f, 13f, 14f,
             14f, 15f, 16f, 16f,
             17f, 18f, 18f, 19f
@@ -90,7 +94,8 @@ public class GemSpawner {
             0f, 1f, 2f, 2f,
             3f, 4f, 4f, 5f,
             5f, 6f, 6f, 7f,
-            8f, 8f, 9f, 10f,
+            7f, 8f, 8f, 9f,
+            9f, 9f, 10f, 10f,
             10.4f, 10.8f, 11.2f, 11.6f,
             12f, 12.4f, 12.8f, 13.2f,
             13.6f, 14f, 14.4f, 14.8f,
@@ -150,8 +155,8 @@ public class GemSpawner {
                 ColorEntity.Type type = ColorEntity.Type.values()[shuffle[order[i]]];
                 Gem.Size size;
                 if (i == 0) size = Gem.Size.SMALL;
-                else if (i % 11 == 0) size = Gem.Size.LARGE;
-                else if (i % 5 == 0) size = Gem.Size.MEDIUM;
+                else if (i % 9 == 0) size = Gem.Size.LARGE;
+                else if (i % 4 == 0) size = Gem.Size.MEDIUM;
                 else size = Gem.Size.SMALL;
                 return new Gem(context, type, size, difficulty, listener);
             }

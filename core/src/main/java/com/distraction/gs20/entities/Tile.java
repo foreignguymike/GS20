@@ -1,17 +1,24 @@
 package com.distraction.gs20.entities;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.distraction.gs20.Context;
 import com.distraction.gs20.utils.Constants;
+import com.distraction.gs20.utils.Utils;
 
 public class Tile extends Entity {
+
+    private static final float FLASH_TIME = 0.5f;
 
     private final TextureRegion pixel;
 
     private Gem gem;
 
     public boolean highlight;
+
+    private float time;
+    private Color flashColor;
 
     public Tile(Context context) {
         pixel = context.getImage("pixel");
@@ -32,8 +39,19 @@ public class Tile extends Entity {
         return gem1;
     }
 
+    public void flash(Color color) {
+        this.flashColor = color;
+    }
+
     @Override
     public void update(float dt) {
+        if (flashColor != null) {
+            time += dt;
+        }
+        if (time > FLASH_TIME) {
+            flashColor = null;
+            time = 0f;
+        }
         if (gem != null) {
             gem.update(dt);
         }
@@ -41,11 +59,18 @@ public class Tile extends Entity {
 
     @Override
     public void render(Batch b) {
+        b.setColor(Constants.BG_COLOR);
+        b.draw(pixel, sleft() + 1, sbottom() + 1, swidth() - 1, sheight() - 1);
         b.setColor(Constants.TILE_COLOR);
         b.draw(pixel, sleft(), sbottom(), swidth(), 1f);
         b.draw(pixel, sleft(), sbottom(), 1f, sheight());
         b.draw(pixel, sleft(), stop(), swidth(), 1f);
-        b.draw(pixel, sright(), sbottom(), 1f, sheight());
+        b.draw(pixel, sright(), sbottom(), 1f, sheight() + 1);
+        if (flashColor != null) {
+            b.setColor(flashColor);
+            Utils.setAlpha(b, FLASH_TIME - time / FLASH_TIME);
+            b.draw(pixel, sleft() + 1, sbottom() + 1, swidth() - 1, sheight() - 1);
+        }
         if (highlight) {
             b.setColor(Constants.TILE_HIGHLIGHT_COLOR);
             b.draw(pixel, sleft(), sbottom(), swidth(), sheight());

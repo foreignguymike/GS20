@@ -6,6 +6,8 @@ public class Constants {
 
     public static final String GAME_TITLE = "Gem Snag 20";
 
+    public static final boolean FULLSCREEN = false;
+
     public static final int WIDTH = 270;
     public static final int HEIGHT = 270;
 
@@ -19,5 +21,9 @@ public class Constants {
     public static final Color BG_COLOR = Color.valueOf("393457");
     public static final Color TILE_COLOR = Color.valueOf("606C81");
     public static final Color TILE_HIGHLIGHT_COLOR = new Color(1, 1, 1, 0.3f);
+    public static final Color RED = Color.valueOf("C92464");
+    public static final Color GREEN = Color.valueOf("5BB361");
+    public static final Color BLUE = Color.valueOf("11ADC1");
+    public static final Color YELLOW = Color.valueOf("F7E476");
 
 }

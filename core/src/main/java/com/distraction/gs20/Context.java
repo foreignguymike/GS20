@@ -32,10 +32,6 @@ public class Context {
         return assetManager.get(ATLAS_NAME, TextureAtlas.class).findRegion(key);
     }
 
-    public TextureRegion getImage(String key, int index) {
-        return assetManager.get(ATLAS_NAME, TextureAtlas.class).findRegion(key, index);
-    }
-
     public void dispose() {
         b.dispose();
     }
