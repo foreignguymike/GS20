@@ -9,7 +9,7 @@ import com.distraction.gs20.utils.Constants;
 public class Gem extends ColorEntity {
 
     public interface GemListener {
-        void onScored(int points);
+        void onScored(Gem gem);
     }
 
     public enum Size {
@@ -73,11 +73,7 @@ public class Gem extends ColorEntity {
             setVectorFromDist(SPEED);
             move(dt);
             if (atDestination() && pad != null) {
-                int points = getPoints();
-                if (pad.type != type) {
-                    points = -points;
-                }
-                listener.onScored(points);
+                listener.onScored(this);
                 remove = true;
             }
         }

@@ -6,7 +6,7 @@ public class Constants {
 
     public static final String GAME_TITLE = "Gem Snag 20";
 
-    public static final boolean FULLSCREEN = false;
+    public static final boolean FULLSCREEN = true;
 
     public static final int WIDTH = 270;
     public static final int HEIGHT = 270;

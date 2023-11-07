@@ -72,6 +72,8 @@ public class PlayScreen extends GameScreen implements Gem.GemListener {
 
     private PopupImage[] countdownImages;
 
+    private final FinishScreen.FinishData finishData;
+
     public PlayScreen(Context context, Difficulty difficulty) {
         super(context);
         this.difficulty = difficulty;
@@ -144,6 +146,8 @@ public class PlayScreen extends GameScreen implements Gem.GemListener {
         for (PopupImage image : countdownImages) {
             image.p.set(Constants.WIDTH * 0.5f, Constants.HEIGHT * 0.5f);
         }
+
+        finishData = new FinishScreen.FinishData(difficulty);
     }
 
     private void placeGem(Gem gem) {
@@ -180,8 +184,14 @@ public class PlayScreen extends GameScreen implements Gem.GemListener {
     }
 
     @Override
-    public void onScored(int points) {
-        score += points;
+    public void onScored(Gem gem) {
+        if (gem.pad.type == gem.type) {
+            finishData.addGem(gem);
+            score += gem.getPoints();
+        } else {
+            finishData.flawless = false;
+            score -= gem.getPoints();
+        }
     }
 
     @Override
@@ -269,7 +279,8 @@ public class PlayScreen extends GameScreen implements Gem.GemListener {
             for (PopupImage image : countdownImages) image.update(dt);
             if (time >= 1f) {
                 ignoreInput = true;
-                context.gsm.push(new FinishScreen(context, difficulty));
+                finishData.finalScore = score;
+                context.gsm.push(new FinishScreen(context, finishData));
                 context.gsm.depth++;
                 stage = Stage.LAST;
             }
