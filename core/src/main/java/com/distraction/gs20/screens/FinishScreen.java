@@ -137,11 +137,9 @@ public class FinishScreen extends GameScreen {
                 }
             }
         } else if (stage == Stage.COUNT_SCORE) {
-            System.out.println("count score stage");
             time += dt;
             if (time >= 0.75f) {
                 score += 10000 * dt;
-                System.out.println("counting up score..." + (int) score);
                 if (score >= finalScore) {
                     score = finalScore;
                     stage = Stage.WAIT;

@@ -3,18 +3,49 @@ package com.distraction.gs20.entities;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
+import com.distraction.gs20.utils.Tween;
 
 public class PopupImage extends Entity {
 
-    private TextureRegion image;
+    private final TextureRegion image;
     private float alpha = 1f;
 
     private boolean start;
-    private float timer;
+    private float time;
+
+    public Tween alphaTween;
+    public Tween scaleTween;
+    public float duration;
 
     public PopupImage(TextureRegion image) {
         this.image = image;
         setSize(image);
+
+        // default values
+        alphaTween = (t) -> {
+            float v = 0;
+            if (t < 0.5f) return t * 4f;
+            else if (t < 1f) return MathUtils.map(0.5f, 1f, 1f, -1f, t);
+            v = MathUtils.clamp(v, 0, 1);
+            return v;
+        };
+        scaleTween = (t) -> {
+            float v = 0;
+            if (t < 0.5f) {
+                v = MathUtils.map(0, 0.5f, 10f, -10f, t);
+                if (v < 1) v = 1;
+            } else if (t < 1f) {
+                v = 1f;
+            }
+            return v;
+        };
+        duration = 1f;
+    }
+
+    public void setup(Tween alphaTween, Tween scaleTween, float duration) {
+        this.alphaTween = alphaTween;
+        this.scaleTween = scaleTween;
+        this.duration = duration;
     }
 
     public void start() {
@@ -24,18 +55,10 @@ public class PopupImage extends Entity {
     @Override
     public void update(float dt) {
         if (!start) return;
-        timer += dt;
-        if (timer < 0.5f) {
-            alpha = timer * 4f;
-            scale = MathUtils.map(0, 0.5f, 10f, -10f, timer);
-            if (scale < 1) scale = 1;
-        } else if (timer < 1f) {
-            scale = 1f;
-            alpha = MathUtils.map(0.5f, 1f, 1f, -1f, timer);
-            alpha = MathUtils.clamp(alpha, 0, 1);
-        } else {
-            alpha = 0f;
-        }
+        time += dt;
+        alpha = alphaTween.update(time);
+        scale = scaleTween.update(time);
+        if (time >= duration) remove = true;
     }
 
     @Override

@@ -6,7 +6,7 @@ import com.distraction.gs20.Context;
 
 public class Pad extends ColorEntity {
 
-    private final TextureRegion image;
+    public final TextureRegion image;
 
     public Pad(Context context, Type type) {
         super(type);

@@ -5,6 +5,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.distraction.gs20.Context;
 import com.distraction.gs20.entities.ColorEntity;
@@ -68,9 +69,10 @@ public class PlayScreen extends GameScreen implements Gem.GemListener {
     private Tile currentTile;
 
     private int score;
-    private BitmapFont font;
+    private final BitmapFont font;
 
-    private PopupImage[] countdownImages;
+    private final PopupImage[] countdownImages;
+    private final List<PopupImage> pops;
 
     private final FinishScreen.FinishData finishData;
 
@@ -148,6 +150,8 @@ public class PlayScreen extends GameScreen implements Gem.GemListener {
         }
 
         finishData = new FinishScreen.FinishData(difficulty);
+
+        pops = new ArrayList<>();
     }
 
     private void placeGem(Gem gem) {
@@ -183,11 +187,20 @@ public class PlayScreen extends GameScreen implements Gem.GemListener {
         return null;
     }
 
+    private void createPop(Pad pad) {
+        PopupImage pop = new PopupImage(pad.image);
+        pop.p.set(pad.p);
+        pop.setup((t) -> 1f, (t) -> 1 + 0.3f * MathUtils.sin(t * 3.1415f * 4), 0.25f);
+        pop.start();
+        pops.add(pop);
+    }
+
     @Override
     public void onScored(Gem gem) {
         if (gem.pad.type == gem.type) {
             finishData.addGem(gem);
             score += gem.getPoints();
+            createPop(gem.pad);
         } else {
             finishData.flawless = false;
             score -= gem.getPoints();
@@ -237,10 +250,10 @@ public class PlayScreen extends GameScreen implements Gem.GemListener {
     public void update(float dt) {
         handleInput();
 
-        for (Gem gem : gems) {
-            gem.update(dt);
-        }
+        for (Gem gem : gems) gem.update(dt);
         gems.removeIf(it -> it.remove);
+        for (PopupImage pop : pops) pop.update(dt);
+        pops.removeIf(it -> it.remove);
         for (int row = 0; row < tiles.length; row++) {
             for (int col = 0; col < tiles[row].length; col++) {
                 tiles[row][col].update(dt);
@@ -296,17 +309,14 @@ public class PlayScreen extends GameScreen implements Gem.GemListener {
             b.draw(bg, 0, 0);
 
             b.setColor(1, 1, 1, 1);
-            for (Pad pad : pads) {
-                pad.render(b);
-            }
             for (int row = 0; row < tiles.length; row++) {
                 for (int col = 0; col < tiles[row].length; col++) {
                     tiles[row][col].render(b);
                 }
             }
-            for (Gem gem : gems) {
-                gem.render(b);
-            }
+            for (Pad pad : pads) pad.render(b);
+            for (Gem gem : gems) gem.render(b);
+            for (PopupImage pop : pops) pop.render(b);
 
             b.setColor(1, 1, 1, 1);
             font.draw(b, score + "", Constants.WIDTH * 0.05f, Constants.HEIGHT * 0.95f);
