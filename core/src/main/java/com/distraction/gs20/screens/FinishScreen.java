@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import de.golfgl.gdxgamesvcs.leaderboard.ILeaderBoardEntry;
+
 public class FinishScreen extends GameScreen {
 
     private enum Stage {
@@ -64,6 +66,7 @@ public class FinishScreen extends GameScreen {
 
     private float score;
     private final int finalScore;
+    private final int lowestScore;
 
     public FinishScreen(Context context, FinishData finishData) {
         super(context);
@@ -87,26 +90,31 @@ public class FinishScreen extends GameScreen {
         };
         counts = new float[finalCounts.length];
         textPositions = new float[]{
-            Constants.HEIGHT * 0.8f,
-            Constants.HEIGHT * 0.7f,
-            Constants.HEIGHT * 0.6f,
+            Constants.HEIGHT * 0.2f,
+            Constants.HEIGHT * 0.35f,
             Constants.HEIGHT * 0.5f,
-            Constants.HEIGHT * 0.3f
+            Constants.HEIGHT * 0.65f
         };
         finalScore = calculateFinalScore();
+        if (context.entries.isEmpty()) {
+            lowestScore = 0;
+        } else {
+            ILeaderBoardEntry entry = context.entries.get(context.entries.size() - 1);
+            lowestScore = Integer.parseInt(entry.getFormattedValue());
+        }
     }
 
     private int calculateFinalScore() {
-        System.out.println("calculating final score");
         int score = 0;
         for (Gem gem : finishData.gems) {
             score += gem.getPoints();
         }
-        System.out.println("add points: " + score);
-        System.out.println("subtract points: " + (finishData.miss * Gem.MISS));
         score -= finishData.miss * Gem.MISS;
-        System.out.println("FINAL: " + score);
         return score;
+    }
+
+    private boolean canSubmit() {
+        return finalScore > 0 && (context.entries.size() < 10 || finalScore > lowestScore);
     }
 
     @Override
@@ -116,6 +124,16 @@ public class FinishScreen extends GameScreen {
         if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
             ignoreInput = true;
             context.gsm.push(new FadeTransitionScreen(context, new PlayScreen(context, finishData.difficulty), 2));
+        }
+
+        if (stage == Stage.WAIT) {
+            if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
+                if (canSubmit()) {
+                    ignoreInput = true;
+                    context.gsm.push(new SubmitScreen(context, finishData.difficulty, finalScore));
+                    context.gsm.depth++;
+                }
+            }
         }
     }
 
@@ -181,14 +199,22 @@ public class FinishScreen extends GameScreen {
             font.setColor(1, 1, 1, 1);
             for (int i = 0; i < counts.length; i++) {
                 if (gemImages.length > i) {
-                    b.draw(gemImages[i], Constants.HEIGHT * 0.32f, textPositions[i] - gemImages[i].getRegionHeight() * 0.8f);
+                    b.draw(gemImages[i], textPositions[i] - gemImages[i].getRegionWidth() * 0.2f, Constants.HEIGHT * 0.74f);
                 } else {
-                    font.draw(b, "MISS", Constants.HEIGHT * 0.3f, textPositions[i]);
+                    font.draw(b, "MISS", textPositions[i], Constants.HEIGHT * 0.82f);
                 }
-                font.draw(b, "x " + (int) counts[i], Constants.HEIGHT * 0.55f, textPositions[i]);
+                font.draw(b, "x " + (int) counts[i], textPositions[i], Constants.HEIGHT * 0.70f);
             }
-            font.draw(b, "SCORE", Constants.HEIGHT * 0.3f, textPositions[4]);
-            font.draw(b, (int) score + "", Constants.HEIGHT * 0.55f, textPositions[4]);
+            font.draw(b, "SCORE", Constants.HEIGHT * 0.3f, Constants.HEIGHT * 0.55f);
+            font.draw(b, (int) score + "", Constants.HEIGHT * 0.55f, Constants.HEIGHT * 0.55f);
+
+            if (stage == Stage.WAIT) {
+                font.draw(b, "Press R to restart", Constants.HEIGHT * 0.21f, Constants.HEIGHT * 0.42f);
+                if (canSubmit()) {
+                    font.draw(b, "Press Enter to", Constants.HEIGHT * 0.26f, Constants.HEIGHT * 0.3f);
+                    font.draw(b, "submit score", Constants.HEIGHT * 0.28f, Constants.HEIGHT * 0.22f);
+                }
+            }
         }
         b.end();
     }

@@ -27,6 +27,7 @@ import de.golfgl.gdxgamesvcs.leaderboard.ILeaderBoardEntry;
 public class PlayScreen extends GameScreen implements Gem.GemListener {
 
     private enum Stage {
+        START,
         COUNTDOWN,
         PLAYING,
         FINISH,
@@ -58,7 +59,7 @@ public class PlayScreen extends GameScreen implements Gem.GemListener {
     private final Map<Integer, ColorEntity.Type> keyPadMap;
 
     private final Difficulty difficulty;
-    private Stage stage = Stage.COUNTDOWN;
+    private Stage stage = Stage.START;
 
     private final GemSpawner gemSpawner;
     private final Random random;
@@ -78,6 +79,8 @@ public class PlayScreen extends GameScreen implements Gem.GemListener {
     private final List<PopupImage> pops;
 
     private final FinishScreen.FinishData finishData;
+
+    private float fade = 0.6f;
 
     public PlayScreen(Context context, Difficulty difficulty) {
         super(context);
@@ -232,8 +235,11 @@ public class PlayScreen extends GameScreen implements Gem.GemListener {
             screen.duration = 1f;
             context.gsm.push(screen);
         }
-
-        if (stage == Stage.PLAYING) {
+        if (stage == Stage.START) {
+            if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
+                stage = Stage.COUNTDOWN;
+            }
+        } else if (stage == Stage.PLAYING) {
             keyPadMap.forEach((k, v) -> {
                 if (Gdx.input.isKeyJustPressed(k)) {
                     if (currentTile != null) {
@@ -345,7 +351,14 @@ public class PlayScreen extends GameScreen implements Gem.GemListener {
 
             for (PopupImage image : countdownImages) image.render(b);
 
-            font.draw(b, "LEADERBOARD", Constants.WIDTH * 0.68f, Constants.HEIGHT * 0.92f);
+            if (stage == Stage.START) {
+                b.setColor(0, 0, 0, fade);
+                b.draw(pixel, 0, 0, Constants.HEIGHT, Constants.HEIGHT);
+                font.draw(b, "Press Enter", Constants.HEIGHT * 0.32f, Constants.HEIGHT * 0.6f);
+                font.draw(b, "To Play", Constants.HEIGHT * 0.39f, Constants.HEIGHT * 0.5f);
+            }
+
+            font.draw(b, "LEADERBOARD", Constants.WIDTH * 0.67f, Constants.HEIGHT * 0.92f);
             for (int i = 0; i < 10; i++) {
                 String name;
                 String score;

@@ -25,13 +25,15 @@ public class Constants {
     public static final Color YELLOW = Color.valueOf("FEE761");
     public static final Color DARK = Color.valueOf("181425");
 
-    public static final String APP_ID = "";
-    public static final String API_KEY = "";
-    public static final int LEADERBOARD_ID = 0;
+    public static String APP_ID = "";
+    public static String API_KEY = "";
+    public static int LEADERBOARD_ID = 0;
 
-    // not for you
-//    public static final String APP_ID = ApiConstants.APP_ID;
-//    public static final String API_KEY = ApiConstants.API_KEY;
-//    public static final int LEADERBOARD_ID = ApiConstants.LEADERBOARD_ID;
+    static {
+        // not for you
+//        APP_ID = ApiConstants.APP_ID;
+//        API_KEY = ApiConstants.API_KEY;
+//        LEADERBOARD_ID = ApiConstants.LEADERBOARD_ID;
+    }
 
 }

@@ -57,6 +57,7 @@ public class Context {
 
     public void fetchLeaderboard(SimpleCallback callback) {
         entries.clear();
+        if (Constants.LEADERBOARD_ID == 0) return;
         client.fetchLeaderboardEntries("", 7, false, leaderBoard -> {
             entries.clear();
             for (int i = 0; i < leaderBoard.size; i++) {
