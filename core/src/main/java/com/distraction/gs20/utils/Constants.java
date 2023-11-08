@@ -6,9 +6,9 @@ public class Constants {
 
     public static final String GAME_TITLE = "Gem Snag 20";
 
-    public static final boolean FULLSCREEN = true;
+    public static final boolean FULLSCREEN = false;
 
-    public static final int WIDTH = 270;
+    public static final int WIDTH = 480;
     public static final int HEIGHT = 270;
 
     public static final int DESKTOP_SCALE = 2;
@@ -23,5 +23,15 @@ public class Constants {
     public static final Color GREEN = Color.valueOf("63C74D");
     public static final Color BLUE = Color.valueOf("0099DB");
     public static final Color YELLOW = Color.valueOf("FEE761");
+    public static final Color DARK = Color.valueOf("181425");
+
+    public static final String APP_ID = "";
+    public static final String API_KEY = "";
+    public static final int LEADERBOARD_ID = 0;
+
+    // not for you
+//    public static final String APP_ID = ApiConstants.APP_ID;
+//    public static final String API_KEY = ApiConstants.API_KEY;
+//    public static final int LEADERBOARD_ID = ApiConstants.LEADERBOARD_ID;
 
 }

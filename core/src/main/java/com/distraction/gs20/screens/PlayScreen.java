@@ -22,6 +22,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import de.golfgl.gdxgamesvcs.leaderboard.ILeaderBoardEntry;
+
 public class PlayScreen extends GameScreen implements Gem.GemListener {
 
     private enum Stage {
@@ -44,13 +46,14 @@ public class PlayScreen extends GameScreen implements Gem.GemListener {
     }
 
     private final Map<ColorEntity.Type, Vector2> PAD_POSITIONS = new HashMap<>() {{
-        put(ColorEntity.Type.RED, new Vector2(Constants.WIDTH * 0.5f, Constants.HEIGHT * 0.9296f));
-        put(ColorEntity.Type.GREEN, new Vector2(Constants.WIDTH * 0.9296f, Constants.HEIGHT * 0.5f));
-        put(ColorEntity.Type.BLUE, new Vector2(Constants.WIDTH * 0.5f, Constants.HEIGHT * 0.0703f));
-        put(ColorEntity.Type.YELLOW, new Vector2(Constants.WIDTH * 0.0703f, Constants.HEIGHT * 0.5f));
+        put(ColorEntity.Type.RED, new Vector2(Constants.HEIGHT * 0.5f, Constants.HEIGHT * 0.9296f));
+        put(ColorEntity.Type.GREEN, new Vector2(Constants.HEIGHT * 0.9296f, Constants.HEIGHT * 0.5f));
+        put(ColorEntity.Type.BLUE, new Vector2(Constants.HEIGHT * 0.5f, Constants.HEIGHT * 0.0703f));
+        put(ColorEntity.Type.YELLOW, new Vector2(Constants.HEIGHT * 0.0703f, Constants.HEIGHT * 0.5f));
     }};
 
-    private TextureRegion bg;
+    private final TextureRegion bg;
+    private final TextureRegion lbg;
 
     private final Map<Integer, ColorEntity.Type> keyPadMap;
 
@@ -81,6 +84,7 @@ public class PlayScreen extends GameScreen implements Gem.GemListener {
         this.difficulty = difficulty;
 
         bg = context.getImage("bg");
+        lbg = context.getImage("leaderboardbg");
 
         gemSpawner = new GemSpawner(context, difficulty, this);
         random = new Random();
@@ -123,7 +127,7 @@ public class PlayScreen extends GameScreen implements Gem.GemListener {
         for (int row = 0; row < tiles.length; row++) {
             for (int col = 0; col < tiles[row].length; col++) {
                 Tile tile = new Tile(context);
-                float x = Constants.WIDTH * (0.5f + (row - 2) * Constants.TILE_SIZE);
+                float x = Constants.HEIGHT * (0.5f + (row - 2) * Constants.TILE_SIZE);
                 float y = Constants.HEIGHT * (0.5f + (col - 2) * Constants.TILE_SIZE);
                 tile.p.set(x, y);
                 tiles[row][col] = tile;
@@ -136,7 +140,7 @@ public class PlayScreen extends GameScreen implements Gem.GemListener {
         Gem[] startingGems = gemSpawner.init();
         for (Gem gem : startingGems) placeGem(gem);
 
-        font = new BitmapFont();
+        font = context.getFont();
 
         countdownImages = new PopupImage[]{
             new PopupImage(context.getImage("3")),
@@ -146,12 +150,20 @@ public class PlayScreen extends GameScreen implements Gem.GemListener {
             new PopupImage(context.getImage("time"))
         };
         for (PopupImage image : countdownImages) {
-            image.p.set(Constants.WIDTH * 0.5f, Constants.HEIGHT * 0.5f);
+            image.p.set(Constants.HEIGHT * 0.5f, Constants.HEIGHT * 0.5f);
         }
 
         finishData = new FinishScreen.FinishData(difficulty);
 
         pops = new ArrayList<>();
+
+        refreshLeaderboard();
+    }
+
+    private void refreshLeaderboard() {
+        context.fetchLeaderboard(() -> {
+
+        });
     }
 
     private void placeGem(Gem gem) {
@@ -203,7 +215,8 @@ public class PlayScreen extends GameScreen implements Gem.GemListener {
             createPop(gem.pad);
         } else {
             finishData.flawless = false;
-            score -= gem.getPoints();
+            finishData.miss++;
+            score -= Gem.MISS;
         }
     }
 
@@ -292,7 +305,6 @@ public class PlayScreen extends GameScreen implements Gem.GemListener {
             for (PopupImage image : countdownImages) image.update(dt);
             if (time >= 1f) {
                 ignoreInput = true;
-                finishData.finalScore = score;
                 context.gsm.push(new FinishScreen(context, finishData));
                 context.gsm.depth++;
                 stage = Stage.LAST;
@@ -305,6 +317,12 @@ public class PlayScreen extends GameScreen implements Gem.GemListener {
         b.setProjectionMatrix(viewport.getCamera().combined);
         b.begin();
         {
+            b.setColor(Constants.DARK);
+            b.draw(pixel, 0, 0, Constants.WIDTH, Constants.HEIGHT);
+
+            b.setColor(1, 1, 1, 1);
+            b.draw(lbg, Constants.WIDTH - lbg.getRegionWidth(), 0);
+
             b.setColor(1, 1, 1, 1);
             b.draw(bg, 0, 0);
 
@@ -319,13 +337,29 @@ public class PlayScreen extends GameScreen implements Gem.GemListener {
             for (PopupImage pop : pops) pop.render(b);
 
             b.setColor(1, 1, 1, 1);
-            font.draw(b, score + "", Constants.WIDTH * 0.05f, Constants.HEIGHT * 0.95f);
+            font.draw(b, score + "", Constants.HEIGHT * 0.05f, Constants.HEIGHT * 0.95f);
 
             if (stage == Stage.PLAYING) {
-                font.draw(b, (20 - time) + "", Constants.WIDTH * 0.05f, Constants.HEIGHT * 0.05f);
+                font.draw(b, (20 - time) + "", Constants.HEIGHT * 0.05f, Constants.HEIGHT * 0.05f);
             }
 
             for (PopupImage image : countdownImages) image.render(b);
+
+            font.draw(b, "LEADERBOARD", Constants.WIDTH * 0.68f, Constants.HEIGHT * 0.92f);
+            for (int i = 0; i < 10; i++) {
+                String name;
+                String score;
+                if (i < context.entries.size()) {
+                    ILeaderBoardEntry entry = context.entries.get(i);
+                    name = entry.getUserDisplayName();
+                    score = entry.getFormattedValue();
+                } else {
+                    name = "---";
+                    score = "---";
+                }
+                font.draw(b, name, Constants.WIDTH * 0.64f, Constants.HEIGHT * 0.82f - i * Constants.HEIGHT * 0.07f);
+                font.draw(b, score, Constants.WIDTH * 0.82f, Constants.HEIGHT * 0.82f - i * Constants.HEIGHT * 0.07f);
+            }
         }
         b.end();
     }

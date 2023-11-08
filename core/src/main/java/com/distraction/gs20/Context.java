@@ -1,11 +1,20 @@
 package com.distraction.gs20;
 
+import com.badlogic.gdx.Net;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.distraction.gs20.gj.GameJoltClient;
+import com.distraction.gs20.utils.Constants;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import de.golfgl.gdxgamesvcs.leaderboard.ILeaderBoardEntry;
 
 /**
  * Holds all important game stuff.
@@ -18,6 +27,9 @@ public class Context {
     public final AssetManager assetManager;
     public final GameScreenManager gsm;
     public final Batch b;
+
+    public GameJoltClient client;
+    public List<ILeaderBoardEntry> entries = new ArrayList<>();
 
     public boolean babyMode = false;
 
@@ -41,6 +53,26 @@ public class Context {
 
     public void dispose() {
         b.dispose();
+    }
+
+    public void fetchLeaderboard(SimpleCallback callback) {
+        entries.clear();
+        client.fetchLeaderboardEntries("", 7, false, leaderBoard -> {
+            entries.clear();
+            for (int i = 0; i < leaderBoard.size; i++) {
+                entries.add(leaderBoard.get(i));
+            }
+            callback.callback();
+        });
+    }
+
+    public void submitScore(String name, int score, Net.HttpResponseListener listener) {
+        client.setGuestName(name);
+        client.submitToLeaderboard("", score, "", 10000, listener);
+    }
+
+    public interface SimpleCallback {
+        void callback();
     }
 
 }

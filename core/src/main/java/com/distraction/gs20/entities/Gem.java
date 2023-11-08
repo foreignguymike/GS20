@@ -28,6 +28,7 @@ public class Gem extends ColorEntity {
     }
 
     private static final float SPEED = Constants.WIDTH * 3f;
+    public static final int MISS = 200;
 
     private final TextureRegion image;
 

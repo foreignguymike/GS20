@@ -22,7 +22,7 @@ public class Tile extends Entity {
 
     public Tile(Context context) {
         pixel = context.getImage("pixel");
-        float size = Constants.WIDTH * Constants.TILE_SIZE;
+        float size = Constants.HEIGHT * Constants.TILE_SIZE;
         setSize(size, size);
     }
 

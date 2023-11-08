@@ -152,3 +152,6 @@ Thumbs.db
 *~
 *.*#
 *#*#
+
+## api stuff
+core/src/main/java/com/distraction/gs20/utils/ApiConstants.java

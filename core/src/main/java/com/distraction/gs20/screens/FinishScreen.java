@@ -26,19 +26,22 @@ public class FinishScreen extends GameScreen {
     public static class FinishData {
 
         public final PlayScreen.Difficulty difficulty;
+        public final List<Gem> gems;
         private final int[] counts;
+        public int miss = 0;
 
         public boolean flawless = true;
-        public int finalScore;
 
         public FinishData(PlayScreen.Difficulty difficulty) {
             this.difficulty = difficulty;
+            gems = new ArrayList<>();
             counts = new int[ColorEntity.Type.values().length];
             Arrays.fill(counts, 0);
         }
 
         public void addGem(Gem gem) {
             counts[gem.size.ordinal()]++;
+            gems.add(gem);
         }
     }
 
@@ -79,16 +82,31 @@ public class FinishScreen extends GameScreen {
         finalCounts = new int[]{
             finishData.counts[Gem.Size.LARGE.ordinal()],
             finishData.counts[Gem.Size.MEDIUM.ordinal()],
-            finishData.counts[Gem.Size.SMALL.ordinal()]
+            finishData.counts[Gem.Size.SMALL.ordinal()],
+            finishData.miss
         };
         counts = new float[finalCounts.length];
         textPositions = new float[]{
-            Constants.HEIGHT * 0.75f,
+            Constants.HEIGHT * 0.8f,
+            Constants.HEIGHT * 0.7f,
             Constants.HEIGHT * 0.6f,
-            Constants.HEIGHT * 0.45f,
+            Constants.HEIGHT * 0.5f,
             Constants.HEIGHT * 0.3f
         };
-        finalScore = finishData.finalScore;
+        finalScore = calculateFinalScore();
+    }
+
+    private int calculateFinalScore() {
+        System.out.println("calculating final score");
+        int score = 0;
+        for (Gem gem : finishData.gems) {
+            score += gem.getPoints();
+        }
+        System.out.println("add points: " + score);
+        System.out.println("subtract points: " + (finishData.miss * Gem.MISS));
+        score -= finishData.miss * Gem.MISS;
+        System.out.println("FINAL: " + score);
+        return score;
     }
 
     @Override
@@ -154,19 +172,23 @@ public class FinishScreen extends GameScreen {
         {
             b.setProjectionMatrix(uiViewport.getCamera().combined);
             b.setColor(0, 0, 0, fade);
-            b.draw(pixel, 0, 0, Constants.WIDTH, Constants.HEIGHT);
+            b.draw(pixel, 0, 0, Constants.HEIGHT, Constants.HEIGHT);
 
             b.setProjectionMatrix(viewport.getCamera().combined);
             b.setColor(1, 1, 1, 1);
-            b.draw(bg, (Constants.WIDTH - bg.getRegionWidth()) / 2f, (Constants.HEIGHT - bg.getRegionHeight()) / 2f);
+            b.draw(bg, (Constants.HEIGHT - bg.getRegionWidth()) / 2f, (Constants.HEIGHT - bg.getRegionHeight()) / 2f);
             b.setColor(1, 1, 1, 1);
             font.setColor(1, 1, 1, 1);
-            for (int i = 0; i < gemImages.length; i++) {
-                b.draw(gemImages[i], Constants.WIDTH * 0.32f, textPositions[i] - gemImages[i].getRegionHeight() * 0.8f);
-                font.draw(b, "x " + (int) counts[i], Constants.WIDTH * 0.55f, textPositions[i]);
+            for (int i = 0; i < counts.length; i++) {
+                if (gemImages.length > i) {
+                    b.draw(gemImages[i], Constants.HEIGHT * 0.32f, textPositions[i] - gemImages[i].getRegionHeight() * 0.8f);
+                } else {
+                    font.draw(b, "MISS", Constants.HEIGHT * 0.3f, textPositions[i]);
+                }
+                font.draw(b, "x " + (int) counts[i], Constants.HEIGHT * 0.55f, textPositions[i]);
             }
-            font.draw(b, "score:", Constants.WIDTH * 0.3f, textPositions[3]);
-            font.draw(b, (int) score + "", Constants.WIDTH * 0.55f, textPositions[3]);
+            font.draw(b, "SCORE", Constants.HEIGHT * 0.3f, textPositions[4]);
+            font.draw(b, (int) score + "", Constants.HEIGHT * 0.55f, textPositions[4]);
         }
         b.end();
     }
