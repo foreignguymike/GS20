@@ -256,8 +256,15 @@ public class FinishScreen extends GameScreen {
             font.draw(b, (int) score + "", Constants.HEIGHT * 0.55f, Constants.HEIGHT * 0.43f);
 
             if (stage == Stage.WAIT) {
-                restartButton.render(b);
-                submitButton.render(b);
+                if (canSubmit()) {
+                    restartButton.p.set(Constants.HEIGHT * 0.336f, Constants.HEIGHT * 0.265f);
+                    submitButton.p.set(Constants.HEIGHT * 0.664f, Constants.HEIGHT * 0.265f);
+                    restartButton.render(b);
+                    submitButton.render(b);
+                } else {
+                    restartButton.p.set(Constants.HEIGHT * 0.5f, Constants.HEIGHT * 0.265f);
+                    restartButton.render(b);
+                }
             }
         }
         b.end();
