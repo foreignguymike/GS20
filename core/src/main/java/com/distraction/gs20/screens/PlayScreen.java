@@ -189,21 +189,29 @@ public class PlayScreen extends GameScreen implements Gem.GemListener {
 
         pops = new ArrayList<>();
 
-        refreshLeaderboard();
+        requestLeaderboards();
     }
 
-    private void refreshLeaderboard() {
+    private void requestLeaderboards() {
         if (!context.leaderboardsInitialized) {
             context.leaderboardsInitialized = true;
             context.fetchLeaderboard(() -> {
-                for (int i = 0; i < 10; i++) {
-                    if (i < context.entries.size()) {
-                        ILeaderBoardEntry entry = context.entries.get(i);
-                        scoreFonts[i][1].setText(entry.getUserDisplayName());
-                        scoreFonts[i][2].setText(entry.getFormattedValue());
-                    }
-                }
+                updateLeaderboards();
             });
+        }
+        updateLeaderboards();
+    }
+
+    private void updateLeaderboards() {
+        for (int i = 0; i < 10; i++) {
+            if (i < context.entries.size()) {
+                ILeaderBoardEntry entry = context.entries.get(i);
+                scoreFonts[i][1].setText(entry.getUserDisplayName());
+                scoreFonts[i][2].setText(entry.getFormattedValue());
+            } else {
+                scoreFonts[i][1].setText("-");
+                scoreFonts[i][2].setText("-");
+            }
         }
     }
 

@@ -158,8 +158,9 @@ public class FinishScreen extends GameScreen {
             if (Gdx.input.justTouched()) {
                 for (int i = 0; i < finalCounts.length; i++) {
                     counts[i] = finalCounts[i];
-                    stage = Stage.WAIT;
                 }
+                score = finalScore;
+                stage = Stage.WAIT;
             }
         }
     }
