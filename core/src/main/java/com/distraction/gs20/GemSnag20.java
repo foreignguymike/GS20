@@ -2,6 +2,7 @@ package com.distraction.gs20;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Net;
 import com.badlogic.gdx.graphics.GL20;
 import com.distraction.gs20.gj.GameJoltClient;
 import com.distraction.gs20.screens.PlayScreen;

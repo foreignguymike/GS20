@@ -9,6 +9,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.distraction.gs20.Context;
 import com.distraction.gs20.entities.ColorEntity;
+import com.distraction.gs20.entities.FontEntity;
 import com.distraction.gs20.entities.Gem;
 import com.distraction.gs20.entities.Pad;
 import com.distraction.gs20.entities.PopupImage;
@@ -46,13 +47,6 @@ public class PlayScreen extends GameScreen implements Gem.GemListener {
         }
     }
 
-    private final Map<ColorEntity.Type, Vector2> PAD_POSITIONS = new HashMap<>() {{
-        put(ColorEntity.Type.RED, new Vector2(Constants.HEIGHT * 0.5f, Constants.HEIGHT * 0.9296f));
-        put(ColorEntity.Type.GREEN, new Vector2(Constants.HEIGHT * 0.9296f, Constants.HEIGHT * 0.5f));
-        put(ColorEntity.Type.BLUE, new Vector2(Constants.HEIGHT * 0.5f, Constants.HEIGHT * 0.0703f));
-        put(ColorEntity.Type.YELLOW, new Vector2(Constants.HEIGHT * 0.0703f, Constants.HEIGHT * 0.5f));
-    }};
-
     private final TextureRegion bg;
     private final TextureRegion lbg;
 
@@ -74,13 +68,14 @@ public class PlayScreen extends GameScreen implements Gem.GemListener {
 
     private int score;
     private final BitmapFont font;
+    private final FontEntity font1;
+    private final FontEntity[][] scoreFonts;
+    private final FontEntity[] startFonts;
 
     private final PopupImage[] countdownImages;
     private final List<PopupImage> pops;
 
-    private final FinishScreen.FinishData finishData;
-
-    private float fade = 0.6f;
+    private final FinishScreen.PlayData playData;
 
     public PlayScreen(Context context, Difficulty difficulty) {
         super(context);
@@ -102,11 +97,18 @@ public class PlayScreen extends GameScreen implements Gem.GemListener {
             types.add(ColorEntity.Type.RED);
             types.add(ColorEntity.Type.BLUE);
         }
+
+        Map<ColorEntity.Type, Vector2> padPositions = new HashMap<>() {{
+            put(ColorEntity.Type.RED, new Vector2(Constants.HEIGHT * 0.5f, Constants.HEIGHT * 0.9296f));
+            put(ColorEntity.Type.GREEN, new Vector2(Constants.HEIGHT * 0.9296f, Constants.HEIGHT * 0.5f));
+            put(ColorEntity.Type.BLUE, new Vector2(Constants.HEIGHT * 0.5f, Constants.HEIGHT * 0.0703f));
+            put(ColorEntity.Type.YELLOW, new Vector2(Constants.HEIGHT * 0.0703f, Constants.HEIGHT * 0.5f));
+        }};
         pads = new Pad[types.size()];
         for (int i = 0; i < types.size(); i++) {
             ColorEntity.Type type = types.get(i);
             pads[i] = new Pad(context, type);
-            pads[i].p.set(PAD_POSITIONS.get(type));
+            pads[i].p.set(padPositions.get(type));
         }
 
         keyPadMap = new HashMap<>();
@@ -143,7 +145,34 @@ public class PlayScreen extends GameScreen implements Gem.GemListener {
         Gem[] startingGems = gemSpawner.init();
         for (Gem gem : startingGems) placeGem(gem);
 
+        BitmapFont impactFont = context.getFont(Context.FONT_NAME_VCR20);
         font = context.getFont();
+        font1 = new FontEntity(impactFont);
+        font1.setText("LEADERBOARD");
+        font1.p.set(Constants.WIDTH - (Constants.WIDTH - Constants.HEIGHT) / 2f, Constants.HEIGHT * 0.864f);
+
+        scoreFonts = new FontEntity[10][3];
+        for (int row = 0; row < scoreFonts.length; row++) {
+            scoreFonts[row][0] = new FontEntity(impactFont);
+            scoreFonts[row][1] = new FontEntity(impactFont);
+            scoreFonts[row][2] = new FontEntity(impactFont);
+
+            scoreFonts[row][0].p.set(Constants.WIDTH * 0.62f, Constants.HEIGHT * 0.748f - row * Constants.HEIGHT * 0.074f);
+            scoreFonts[row][1].p.set(Constants.WIDTH * 0.7f, Constants.HEIGHT * 0.748f - row * Constants.HEIGHT * 0.074f);
+            scoreFonts[row][2].p.set(Constants.WIDTH * 0.82f, Constants.HEIGHT * 0.748f - row * Constants.HEIGHT * 0.074f);
+
+            scoreFonts[row][0].setText((row + 1) + "");
+            scoreFonts[row][1].setText("-");
+            scoreFonts[row][2].setText("-");
+        }
+
+        startFonts = new FontEntity[2];
+        startFonts[0] = new FontEntity(impactFont);
+        startFonts[0].setText("Press ENTER");
+        startFonts[0].p.set(Constants.HEIGHT * 0.5f, Constants.HEIGHT * 0.55f);
+        startFonts[1] = new FontEntity(impactFont);
+        startFonts[1].setText("To Play");
+        startFonts[1].p.set(Constants.HEIGHT * 0.5f, Constants.HEIGHT * 0.45f);
 
         countdownImages = new PopupImage[]{
             new PopupImage(context.getImage("3")),
@@ -156,7 +185,7 @@ public class PlayScreen extends GameScreen implements Gem.GemListener {
             image.p.set(Constants.HEIGHT * 0.5f, Constants.HEIGHT * 0.5f);
         }
 
-        finishData = new FinishScreen.FinishData(difficulty);
+        playData = new FinishScreen.PlayData(difficulty);
 
         pops = new ArrayList<>();
 
@@ -164,9 +193,18 @@ public class PlayScreen extends GameScreen implements Gem.GemListener {
     }
 
     private void refreshLeaderboard() {
-        context.fetchLeaderboard(() -> {
-
-        });
+        if (!context.leaderboardsInitialized) {
+            context.leaderboardsInitialized = true;
+            context.fetchLeaderboard(() -> {
+                for (int i = 0; i < 10; i++) {
+                    if (i < context.entries.size()) {
+                        ILeaderBoardEntry entry = context.entries.get(i);
+                        scoreFonts[i][1].setText(entry.getUserDisplayName());
+                        scoreFonts[i][2].setText(entry.getFormattedValue());
+                    }
+                }
+            });
+        }
     }
 
     private void placeGem(Gem gem) {
@@ -175,18 +213,25 @@ public class PlayScreen extends GameScreen implements Gem.GemListener {
         Tile tile = availableTiles.remove(index);
         tile.setGem(gem);
         gems.add(gem);
+
+        // auto play
+//        Pad pad = getPad(gem.type);
+//        if (pad != null) {
+//            gem.collect(pad);
+//            availableTiles.add(gem.tile);
+//            gem.tile.flash(pad.type.color);
+//        }
     }
 
     private void updateCurrentTile() {
-        for (int row = 0; row < tiles.length; row++) {
-            for (int col = 0; col < tiles[row].length; col++) {
-                if (tiles[row][col].contains(m.x, m.y)) {
-                    Tile newTile = tiles[row][col];
-                    if (currentTile != newTile && currentTile != null) {
+        for (Tile[] tile : tiles) {
+            for (Tile value : tile) {
+                if (value.contains(m.x, m.y)) {
+                    if (currentTile != value && currentTile != null) {
                         currentTile.highlight = false;
                     }
-                    currentTile = newTile;
-                    newTile.highlight = true;
+                    currentTile = value;
+                    value.highlight = true;
                     return;
                 }
             }
@@ -213,13 +258,17 @@ public class PlayScreen extends GameScreen implements Gem.GemListener {
     @Override
     public void onScored(Gem gem) {
         if (gem.pad.type == gem.type) {
-            finishData.addGem(gem);
+            playData.addGem(gem);
             score += gem.getPoints();
             createPop(gem.pad);
+            playData.currentCombo++;
         } else {
-            finishData.flawless = false;
-            finishData.miss++;
+            playData.miss++;
             score -= Gem.MISS;
+            if (playData.currentCombo > playData.bestCombo) {
+                playData.bestCombo = playData.currentCombo;
+                playData.currentCombo = 0;
+            }
         }
     }
 
@@ -231,6 +280,7 @@ public class PlayScreen extends GameScreen implements Gem.GemListener {
         if (ignoreInput) return;
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
+            ignoreInput = true;
             TransitionScreen screen = new FadeTransitionScreen(context, new PlayScreen(context, difficulty));
             screen.duration = 1f;
             context.gsm.push(screen);
@@ -260,8 +310,6 @@ public class PlayScreen extends GameScreen implements Gem.GemListener {
                 stage = Stage.FINISH;
                 countdownImages[4].start();
             }
-        } else if (stage == Stage.FINISH) {
-
         }
     }
 
@@ -273,9 +321,9 @@ public class PlayScreen extends GameScreen implements Gem.GemListener {
         gems.removeIf(it -> it.remove);
         for (PopupImage pop : pops) pop.update(dt);
         pops.removeIf(it -> it.remove);
-        for (int row = 0; row < tiles.length; row++) {
-            for (int col = 0; col < tiles[row].length; col++) {
-                tiles[row][col].update(dt);
+        for (Tile[] tile : tiles) {
+            for (Tile value : tile) {
+                value.update(dt);
             }
         }
 
@@ -311,7 +359,10 @@ public class PlayScreen extends GameScreen implements Gem.GemListener {
             for (PopupImage image : countdownImages) image.update(dt);
             if (time >= 1f) {
                 ignoreInput = true;
-                context.gsm.push(new FinishScreen(context, finishData));
+                if (playData.currentCombo > playData.bestCombo) {
+                    playData.bestCombo = playData.currentCombo;
+                }
+                context.gsm.push(new FinishScreen(context, playData));
                 context.gsm.depth++;
                 stage = Stage.LAST;
             }
@@ -333,9 +384,9 @@ public class PlayScreen extends GameScreen implements Gem.GemListener {
             b.draw(bg, 0, 0);
 
             b.setColor(1, 1, 1, 1);
-            for (int row = 0; row < tiles.length; row++) {
-                for (int col = 0; col < tiles[row].length; col++) {
-                    tiles[row][col].render(b);
+            for (Tile[] tile : tiles) {
+                for (Tile value : tile) {
+                    value.render(b);
                 }
             }
             for (Pad pad : pads) pad.render(b);
@@ -352,26 +403,17 @@ public class PlayScreen extends GameScreen implements Gem.GemListener {
             for (PopupImage image : countdownImages) image.render(b);
 
             if (stage == Stage.START) {
-                b.setColor(0, 0, 0, fade);
+                b.setColor(0, 0, 0, 0.6f);
                 b.draw(pixel, 0, 0, Constants.HEIGHT, Constants.HEIGHT);
-                font.draw(b, "Press Enter", Constants.HEIGHT * 0.32f, Constants.HEIGHT * 0.6f);
-                font.draw(b, "To Play", Constants.HEIGHT * 0.39f, Constants.HEIGHT * 0.5f);
+                startFonts[0].render(b);
+                startFonts[1].render(b);
             }
 
-            font.draw(b, "LEADERBOARD", Constants.WIDTH * 0.67f, Constants.HEIGHT * 0.92f);
-            for (int i = 0; i < 10; i++) {
-                String name;
-                String score;
-                if (i < context.entries.size()) {
-                    ILeaderBoardEntry entry = context.entries.get(i);
-                    name = entry.getUserDisplayName();
-                    score = entry.getFormattedValue();
-                } else {
-                    name = "---";
-                    score = "---";
+            font1.render(b);
+            for (FontEntity[] scoreFont : scoreFonts) {
+                for (int i = 0; i < scoreFonts[0].length; i++) {
+                    scoreFont[i].renderLeft(b);
                 }
-                font.draw(b, name, Constants.WIDTH * 0.64f, Constants.HEIGHT * 0.82f - i * Constants.HEIGHT * 0.07f);
-                font.draw(b, score, Constants.WIDTH * 0.82f, Constants.HEIGHT * 0.82f - i * Constants.HEIGHT * 0.07f);
             }
         }
         b.end();

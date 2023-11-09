@@ -12,7 +12,6 @@ import com.distraction.gs20.utils.Constants;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import de.golfgl.gdxgamesvcs.leaderboard.ILeaderBoardEntry;
 
@@ -22,7 +21,8 @@ import de.golfgl.gdxgamesvcs.leaderboard.ILeaderBoardEntry;
 public class Context {
 
     private final static String ATLAS_NAME = "gs20.atlas";
-    private static final String IMPACT_NAME = "impact20.fnt";
+    public static final String FONT_NAME_IMPACT16 = "impact16.fnt";
+    public static final String FONT_NAME_VCR20 = "vcr20.fnt";
 
     public final AssetManager assetManager;
     public final GameScreenManager gsm;
@@ -30,13 +30,15 @@ public class Context {
 
     public GameJoltClient client;
     public List<ILeaderBoardEntry> entries = new ArrayList<>();
+    public boolean leaderboardsInitialized;
 
     public boolean babyMode = false;
 
     public Context() {
         assetManager = new AssetManager();
         assetManager.load(ATLAS_NAME, TextureAtlas.class);
-        assetManager.load(IMPACT_NAME, BitmapFont.class);
+        assetManager.load(FONT_NAME_IMPACT16, BitmapFont.class);
+        assetManager.load(FONT_NAME_VCR20, BitmapFont.class);
         assetManager.finishLoading();
 
         gsm = new GameScreenManager();
@@ -48,7 +50,11 @@ public class Context {
     }
 
     public BitmapFont getFont() {
-        return assetManager.get(IMPACT_NAME, BitmapFont.class);
+        return assetManager.get(FONT_NAME_VCR20, BitmapFont.class);
+    }
+
+    public BitmapFont getFont(String name) {
+        return assetManager.get(name, BitmapFont.class);
     }
 
     public void dispose() {

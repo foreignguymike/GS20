@@ -6,231 +6,245 @@ filter: Nearest,Nearest
 repeat: none
 1
   rotate: false
-  xy: 722, 433
+  xy: 224, 92
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 2
   rotate: false
-  xy: 224, 95
+  xy: 380, 158
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 3
   rotate: false
-  xy: 380, 161
+  xy: 722, 430
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 bg
   rotate: false
-  xy: 2, 227
+  xy: 2, 224
   size: 270, 270
   orig: 270, 270
   offset: 0, 0
   index: -1
 blue1
   rotate: false
-  xy: 828, 459
+  xy: 828, 456
   size: 38, 38
   orig: 38, 38
   offset: 0, 0
   index: -1
 blue2
   rotate: false
-  xy: 224, 15
+  xy: 486, 243
   size: 38, 38
   orig: 38, 38
   offset: 0, 0
   index: -1
 blue3
   rotate: false
-  xy: 330, 121
+  xy: 224, 12
   size: 38, 38
   orig: 38, 38
   offset: 0, 0
   index: -1
 bluea
   rotate: false
-  xy: 224, 55
+  xy: 290, 118
   size: 38, 38
   orig: 38, 38
   offset: 0, 0
   index: -1
 bluepad
   rotate: false
-  xy: 526, 291
+  xy: 988, 463
   size: 31, 31
   orig: 31, 31
   offset: 0, 0
   index: -1
 finishbg
   rotate: false
-  xy: 2, 5
+  xy: 2, 2
   size: 220, 220
   orig: 220, 220
   offset: 0, 0
   index: -1
 gems1
   rotate: false
-  xy: 562, 366
+  xy: 638, 403
   size: 41, 25
   orig: 41, 25
   offset: 0, 0
   index: -1
 gems2
   rotate: false
-  xy: 682, 406
+  xy: 681, 403
   size: 41, 25
   orig: 41, 25
   offset: 0, 0
   index: -1
 gems3
   rotate: false
-  xy: 908, 472
+  xy: 724, 403
   size: 41, 25
   orig: 41, 25
   offset: 0, 0
   index: -1
 go
   rotate: false
-  xy: 224, 161
+  xy: 224, 158
   size: 154, 64
   orig: 154, 64
   offset: 0, 0
   index: -1
 green1
   rotate: false
-  xy: 446, 187
+  xy: 446, 184
   size: 38, 38
   orig: 38, 38
   offset: 0, 0
   index: -1
 green2
   rotate: false
-  xy: 486, 277
+  xy: 486, 283
   size: 38, 38
   orig: 38, 38
   offset: 0, 0
   index: -1
 green3
   rotate: false
-  xy: 602, 393
+  xy: 562, 359
   size: 38, 38
   orig: 38, 38
   offset: 0, 0
   index: -1
 greena
   rotate: false
-  xy: 290, 121
+  xy: 948, 456
   size: 38, 38
   orig: 38, 38
   offset: 0, 0
   index: -1
 greenpad
   rotate: false
-  xy: 410, 128
+  xy: 410, 125
   size: 31, 31
   orig: 31, 31
   offset: 0, 0
   index: -1
 leaderboardbg
   rotate: false
-  xy: 274, 227
+  xy: 274, 224
   size: 210, 270
   orig: 210, 270
   offset: 0, 0
   index: -1
 pixel
   rotate: false
-  xy: 2, 2
+  xy: 1021, 493
   size: 1, 1
   orig: 1, 1
   offset: 0, 0
   index: -1
 pop
   rotate: false
-  xy: 486, 357
+  xy: 486, 354
   size: 74, 74
   orig: 74, 74
   offset: 0, 0
   index: -1
 red1
   rotate: false
-  xy: 486, 317
+  xy: 788, 456
   size: 38, 38
   orig: 38, 38
   offset: 0, 0
   index: -1
 red2
   rotate: false
-  xy: 562, 393
+  xy: 224, 52
   size: 38, 38
   orig: 38, 38
   offset: 0, 0
   index: -1
 red3
   rotate: false
-  xy: 788, 459
+  xy: 486, 203
   size: 38, 38
   orig: 38, 38
   offset: 0, 0
   index: -1
 reda
   rotate: false
-  xy: 642, 393
+  xy: 370, 118
   size: 38, 38
   orig: 38, 38
   offset: 0, 0
   index: -1
 redpad
   rotate: false
-  xy: 526, 324
+  xy: 602, 366
   size: 31, 31
   orig: 31, 31
   offset: 0, 0
   index: -1
+restart
+  rotate: false
+  xy: 562, 399
+  size: 74, 29
+  orig: 74, 29
+  offset: 0, 0
+  index: -1
+submit
+  rotate: false
+  xy: 486, 323
+  size: 74, 29
+  orig: 74, 29
+  offset: 0, 0
+  index: -1
 time
   rotate: false
-  xy: 486, 433
+  xy: 486, 430
   size: 234, 64
   orig: 234, 64
   offset: 0, 0
   index: -1
 yellow1
   rotate: false
-  xy: 486, 237
+  xy: 330, 118
   size: 38, 38
   orig: 38, 38
   offset: 0, 0
   index: -1
 yellow2
   rotate: false
-  xy: 370, 121
+  xy: 868, 456
   size: 38, 38
   orig: 38, 38
   offset: 0, 0
   index: -1
 yellow3
   rotate: false
-  xy: 486, 197
+  xy: 526, 283
   size: 38, 38
   orig: 38, 38
   offset: 0, 0
   index: -1
 yellowa
   rotate: false
-  xy: 868, 459
+  xy: 908, 456
   size: 38, 38
   orig: 38, 38
   offset: 0, 0
   index: -1
 yellowpad
   rotate: false
-  xy: 526, 258
+  xy: 526, 250
   size: 31, 31
   orig: 31, 31
   offset: 0, 0

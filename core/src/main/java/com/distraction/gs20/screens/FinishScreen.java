@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.distraction.gs20.Context;
 import com.distraction.gs20.entities.ColorEntity;
 import com.distraction.gs20.entities.Gem;
+import com.distraction.gs20.entities.ImageEntity;
 import com.distraction.gs20.utils.Constants;
 
 import java.util.ArrayList;
@@ -25,16 +26,16 @@ public class FinishScreen extends GameScreen {
         WAIT
     }
 
-    public static class FinishData {
+    public static class PlayData {
 
         public final PlayScreen.Difficulty difficulty;
         public final List<Gem> gems;
         private final int[] counts;
         public int miss = 0;
+        public int bestCombo;
+        public int currentCombo;
 
-        public boolean flawless = true;
-
-        public FinishData(PlayScreen.Difficulty difficulty) {
+        public PlayData(PlayScreen.Difficulty difficulty) {
             this.difficulty = difficulty;
             gems = new ArrayList<>();
             counts = new int[ColorEntity.Type.values().length];
@@ -49,7 +50,7 @@ public class FinishScreen extends GameScreen {
 
     private Stage stage = Stage.INTRO;
 
-    private final FinishData finishData;
+    private final PlayData playData;
 
     private final TextureRegion bg;
 
@@ -68,9 +69,12 @@ public class FinishScreen extends GameScreen {
     private final int finalScore;
     private final int lowestScore;
 
-    public FinishScreen(Context context, FinishData finishData) {
+    private final ImageEntity restartButton;
+    private final ImageEntity submitButton;
+
+    public FinishScreen(Context context, PlayData playData) {
         super(context);
-        this.finishData = finishData;
+        this.playData = playData;
         bg = context.getImage("finishbg");
         font = context.getFont();
 
@@ -83,17 +87,17 @@ public class FinishScreen extends GameScreen {
             context.getImage("gems1")
         };
         finalCounts = new int[]{
-            finishData.counts[Gem.Size.LARGE.ordinal()],
-            finishData.counts[Gem.Size.MEDIUM.ordinal()],
-            finishData.counts[Gem.Size.SMALL.ordinal()],
-            finishData.miss
+            playData.counts[Gem.Size.LARGE.ordinal()],
+            playData.counts[Gem.Size.MEDIUM.ordinal()],
+            playData.counts[Gem.Size.SMALL.ordinal()],
+            playData.miss,
+            playData.bestCombo
         };
         counts = new float[finalCounts.length];
         textPositions = new float[]{
-            Constants.HEIGHT * 0.2f,
-            Constants.HEIGHT * 0.35f,
-            Constants.HEIGHT * 0.5f,
-            Constants.HEIGHT * 0.65f
+            Constants.HEIGHT * 0.76f,
+            Constants.HEIGHT * 0.64f,
+            Constants.HEIGHT * 0.52f
         };
         finalScore = calculateFinalScore();
         if (context.entries.isEmpty()) {
@@ -102,14 +106,23 @@ public class FinishScreen extends GameScreen {
             ILeaderBoardEntry entry = context.entries.get(context.entries.size() - 1);
             lowestScore = Integer.parseInt(entry.getFormattedValue());
         }
+
+        restartButton = new ImageEntity(context.getImage("restart"));
+        submitButton = new ImageEntity(context.getImage("submit"));
+
+        restartButton.p.set(Constants.HEIGHT * 0.336f, Constants.HEIGHT * 0.265f);
+        submitButton.p.set(Constants.HEIGHT * 0.664f, Constants.HEIGHT * 0.265f);
     }
 
     private int calculateFinalScore() {
         int score = 0;
-        for (Gem gem : finishData.gems) {
+        for (Gem gem : playData.gems) {
             score += gem.getPoints();
         }
-        score -= finishData.miss * Gem.MISS;
+        score -= playData.miss * Gem.MISS;
+        int combo = playData.bestCombo * 100;
+        if (combo > 4000) combo = 4000;
+        score += combo;
         return score;
     }
 
@@ -123,15 +136,29 @@ public class FinishScreen extends GameScreen {
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
             ignoreInput = true;
-            context.gsm.push(new FadeTransitionScreen(context, new PlayScreen(context, finishData.difficulty), 2));
+            context.gsm.push(new FadeTransitionScreen(context, new PlayScreen(context, playData.difficulty), 2));
         }
 
         if (stage == Stage.WAIT) {
-            if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
-                if (canSubmit()) {
+            if (Gdx.input.justTouched()) {
+                unproject();
+                if (restartButton.contains(m.x, m.y)) {
                     ignoreInput = true;
-                    context.gsm.push(new SubmitScreen(context, finishData.difficulty, finalScore));
-                    context.gsm.depth++;
+                    context.gsm.push(new FadeTransitionScreen(context, new PlayScreen(context, playData.difficulty), 2));
+                } else if (submitButton.contains(m.x, m.y)) {
+                    if (canSubmit()) {
+                        ignoreInput = true;
+                        TransitionScreen screen = new FadeTransitionScreen(context, new SubmitScreen(context, playData.difficulty, finalScore), 2);
+                        screen.duration = 1f;
+                        context.gsm.push(screen);
+                    }
+                }
+            }
+        } else if (stage == Stage.TALLY || stage == Stage.COUNT_SCORE) {
+            if (Gdx.input.justTouched()) {
+                for (int i = 0; i < finalCounts.length; i++) {
+                    counts[i] = finalCounts[i];
+                    stage = Stage.WAIT;
                 }
             }
         }
@@ -197,23 +224,21 @@ public class FinishScreen extends GameScreen {
             b.draw(bg, (Constants.HEIGHT - bg.getRegionWidth()) / 2f, (Constants.HEIGHT - bg.getRegionHeight()) / 2f);
             b.setColor(1, 1, 1, 1);
             font.setColor(1, 1, 1, 1);
-            for (int i = 0; i < counts.length; i++) {
-                if (gemImages.length > i) {
-                    b.draw(gemImages[i], textPositions[i] - gemImages[i].getRegionWidth() * 0.2f, Constants.HEIGHT * 0.74f);
-                } else {
-                    font.draw(b, "MISS", textPositions[i], Constants.HEIGHT * 0.82f);
-                }
-                font.draw(b, "x " + (int) counts[i], textPositions[i], Constants.HEIGHT * 0.70f);
+            for (int i = 0; i < gemImages.length; i++) {
+                b.draw(gemImages[i], Constants.HEIGHT * 0.246f - gemImages[i].getRegionWidth() * 0.5f, textPositions[i] - gemImages[i].getRegionHeight() * 0.5f);
+                font.draw(b, "x" + (int) counts[i], Constants.HEIGHT * 0.38f, textPositions[i] + Constants.HEIGHT * 0.02f);
             }
-            font.draw(b, "SCORE", Constants.HEIGHT * 0.3f, Constants.HEIGHT * 0.55f);
-            font.draw(b, (int) score + "", Constants.HEIGHT * 0.55f, Constants.HEIGHT * 0.55f);
+            font.draw(b, "Miss", Constants.HEIGHT * 0.59f, Constants.HEIGHT * 0.78f);
+            font.draw(b, "x" + (int) counts[3], Constants.HEIGHT * 0.59f, Constants.HEIGHT * 0.71f);
+            font.draw(b, "Combo", Constants.HEIGHT * 0.59f, Constants.HEIGHT * 0.61f);
+            font.draw(b, "x" + (int) counts[4], Constants.HEIGHT * 0.59f, Constants.HEIGHT * 0.54f);
+
+            font.draw(b, "Score", Constants.HEIGHT * 0.26f, Constants.HEIGHT * 0.43f);
+            font.draw(b, (int) score + "", Constants.HEIGHT * 0.55f, Constants.HEIGHT * 0.43f);
 
             if (stage == Stage.WAIT) {
-                font.draw(b, "Press R to restart", Constants.HEIGHT * 0.21f, Constants.HEIGHT * 0.42f);
-                if (canSubmit()) {
-                    font.draw(b, "Press Enter to", Constants.HEIGHT * 0.26f, Constants.HEIGHT * 0.3f);
-                    font.draw(b, "submit score", Constants.HEIGHT * 0.28f, Constants.HEIGHT * 0.22f);
-                }
+                restartButton.render(b);
+                submitButton.render(b);
             }
         }
         b.end();

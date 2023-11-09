@@ -31,9 +31,9 @@ public class Constants {
 
     static {
         // not for you
-//        APP_ID = ApiConstants.APP_ID;
-//        API_KEY = ApiConstants.API_KEY;
-//        LEADERBOARD_ID = ApiConstants.LEADERBOARD_ID;
+        APP_ID = ApiConstants.APP_ID;
+        API_KEY = ApiConstants.API_KEY;
+        LEADERBOARD_ID = ApiConstants.LEADERBOARD_ID;
     }
 
 }
