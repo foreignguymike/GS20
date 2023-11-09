@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.distraction.gs20.gj.GameJoltClient;
+import com.distraction.gs20.utils.AudioHandler;
 import com.distraction.gs20.utils.Constants;
 
 import java.util.ArrayList;
@@ -27,6 +28,7 @@ public class Context {
     public final AssetManager assetManager;
     public final GameScreenManager gsm;
     public final Batch b;
+    public AudioHandler audioHandler;
 
     public GameJoltClient client;
     public List<ILeaderBoardEntry> entries = new ArrayList<>();
@@ -35,6 +37,7 @@ public class Context {
     public boolean babyMode = false;
 
     public Context() {
+        audioHandler = new AudioHandler();
         assetManager = new AssetManager();
         assetManager.load(ATLAS_NAME, TextureAtlas.class);
         assetManager.load(FONT_NAME_IMPACT16, BitmapFont.class);

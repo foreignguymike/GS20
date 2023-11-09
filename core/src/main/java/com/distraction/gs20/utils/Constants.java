@@ -6,7 +6,7 @@ public class Constants {
 
     public static final String GAME_TITLE = "Gem Snag 20";
 
-    public static final boolean FULLSCREEN = true;
+    public static final boolean FULLSCREEN = false;
 
     public static final int WIDTH = 480;
     public static final int HEIGHT = 270;
@@ -31,9 +31,9 @@ public class Constants {
 
     static {
         // not for you
-        APP_ID = ApiConstants.APP_ID;
-        API_KEY = ApiConstants.API_KEY;
-        LEADERBOARD_ID = ApiConstants.LEADERBOARD_ID;
+//        APP_ID = ApiConstants.APP_ID;
+//        API_KEY = ApiConstants.API_KEY;
+//        LEADERBOARD_ID = ApiConstants.LEADERBOARD_ID;
     }
 
 }

@@ -216,6 +216,7 @@ public class SubmitScreen extends GameScreen {
         if (Gdx.input.justTouched()) {
             unproject();
             if (submitButton.contains(m.x, m.y)) {
+                context.audioHandler.playSound("click", 0.4f);
                 submit();
             }
         }
@@ -229,6 +230,7 @@ public class SubmitScreen extends GameScreen {
             success = false;
             ignoreInput = true;
             context.gsm.push(new FadeTransitionScreen(context, new PlayScreen(context, difficulty)));
+            context.audioHandler.playSound("success");
         }
     }
 

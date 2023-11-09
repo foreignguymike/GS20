@@ -11,6 +11,7 @@ import com.distraction.gs20.Context;
 import com.distraction.gs20.entities.ColorEntity;
 import com.distraction.gs20.entities.FontEntity;
 import com.distraction.gs20.entities.Gem;
+import com.distraction.gs20.entities.ImageEntity;
 import com.distraction.gs20.entities.Pad;
 import com.distraction.gs20.entities.PopupImage;
 import com.distraction.gs20.entities.Tile;
@@ -66,16 +67,16 @@ public class PlayScreen extends GameScreen implements Gem.GemListener {
     private float time;
     private Tile currentTile;
 
-    private int score;
-    private final BitmapFont font;
     private final FontEntity font1;
     private final FontEntity[][] scoreFonts;
-    private final FontEntity[] startFonts;
+    private final FontEntity startFont;
 
     private final PopupImage[] countdownImages;
     private final List<PopupImage> pops;
 
     private final FinishScreen.PlayData playData;
+
+    private final ImageEntity restartButton;
 
     public PlayScreen(Context context, Difficulty difficulty) {
         super(context);
@@ -146,7 +147,6 @@ public class PlayScreen extends GameScreen implements Gem.GemListener {
         for (Gem gem : startingGems) placeGem(gem);
 
         BitmapFont impactFont = context.getFont(Context.FONT_NAME_VCR20);
-        font = context.getFont();
         font1 = new FontEntity(impactFont);
         font1.setText("LEADERBOARD");
         font1.p.set(Constants.WIDTH - (Constants.WIDTH - Constants.HEIGHT) / 2f, Constants.HEIGHT * 0.864f);
@@ -166,13 +166,9 @@ public class PlayScreen extends GameScreen implements Gem.GemListener {
             scoreFonts[row][2].setText("-");
         }
 
-        startFonts = new FontEntity[2];
-        startFonts[0] = new FontEntity(impactFont);
-        startFonts[0].setText("Press ENTER");
-        startFonts[0].p.set(Constants.HEIGHT * 0.5f, Constants.HEIGHT * 0.55f);
-        startFonts[1] = new FontEntity(impactFont);
-        startFonts[1].setText("To Play");
-        startFonts[1].p.set(Constants.HEIGHT * 0.5f, Constants.HEIGHT * 0.45f);
+        startFont = new FontEntity(impactFont);
+        startFont.setText("Tap to Start");
+        startFont.p.set(Constants.HEIGHT * 0.5f, Constants.HEIGHT * 0.50f);
 
         countdownImages = new PopupImage[]{
             new PopupImage(context.getImage("3")),
@@ -188,6 +184,9 @@ public class PlayScreen extends GameScreen implements Gem.GemListener {
         playData = new FinishScreen.PlayData(difficulty);
 
         pops = new ArrayList<>();
+
+        restartButton = new ImageEntity(context.getImage("restart"));
+        restartButton.p.set(Constants.HEIGHT * 0.155f, Constants.HEIGHT * 0.928f);
 
         requestLeaderboards();
     }
@@ -267,16 +266,16 @@ public class PlayScreen extends GameScreen implements Gem.GemListener {
     public void onScored(Gem gem) {
         if (gem.pad.type == gem.type) {
             playData.addGem(gem);
-            score += gem.getPoints();
             createPop(gem.pad);
             playData.currentCombo++;
+            context.audioHandler.playSound("hit", 0.2f);
         } else {
             playData.miss++;
-            score -= Gem.MISS;
             if (playData.currentCombo > playData.bestCombo) {
                 playData.bestCombo = playData.currentCombo;
                 playData.currentCombo = 0;
             }
+            context.audioHandler.playSound("miss");
         }
     }
 
@@ -287,15 +286,20 @@ public class PlayScreen extends GameScreen implements Gem.GemListener {
 
         if (ignoreInput) return;
 
-        if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
-            ignoreInput = true;
-            TransitionScreen screen = new FadeTransitionScreen(context, new PlayScreen(context, difficulty));
-            screen.duration = 1f;
-            context.gsm.push(screen);
+        if (Gdx.input.justTouched()) {
+            if (restartButton.contains(m.x, m.y)) {
+                ignoreInput = true;
+                TransitionScreen screen = new FadeTransitionScreen(context, new PlayScreen(context, difficulty));
+                screen.duration = 1f;
+                context.gsm.push(screen);
+                return;
+            }
         }
         if (stage == Stage.START) {
-            if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
-                stage = Stage.COUNTDOWN;
+            if (Gdx.input.justTouched()) {
+                if (m.x < Constants.HEIGHT && m.y < Constants.HEIGHT) {
+                    stage = Stage.COUNTDOWN;
+                }
             }
         } else if (stage == Stage.PLAYING) {
             keyPadMap.forEach((k, v) -> {
@@ -340,6 +344,13 @@ public class PlayScreen extends GameScreen implements Gem.GemListener {
             else if (time > 2.75f) countdownImages[2].start();
             else if (time > 1.75f) countdownImages[1].start();
             else if (time > 0.75f) countdownImages[0].start();
+            if (time < 1f && time + dt > 1f ||
+                time < 2f && time + dt > 2f ||
+                time < 3f && time + dt > 3f) {
+                context.audioHandler.playSound("cdlow", 0.7f);
+            } else if (time < 4f && time + dt > 4f) {
+                context.audioHandler.playSound("cdhigh", 0.7f);
+            }
             time += dt;
             if (time >= 4f) {
                 time = 0f;
@@ -402,19 +413,14 @@ public class PlayScreen extends GameScreen implements Gem.GemListener {
             for (PopupImage pop : pops) pop.render(b);
 
             b.setColor(1, 1, 1, 1);
-            font.draw(b, score + "", Constants.HEIGHT * 0.05f, Constants.HEIGHT * 0.95f);
-
-            if (stage == Stage.PLAYING) {
-                font.draw(b, (20 - time) + "", Constants.HEIGHT * 0.05f, Constants.HEIGHT * 0.05f);
-            }
+            restartButton.render(b);
 
             for (PopupImage image : countdownImages) image.render(b);
 
             if (stage == Stage.START) {
                 b.setColor(0, 0, 0, 0.6f);
                 b.draw(pixel, 0, 0, Constants.HEIGHT, Constants.HEIGHT);
-                startFonts[0].render(b);
-                startFonts[1].render(b);
+                startFont.render(b);
             }
 
             font1.render(b);

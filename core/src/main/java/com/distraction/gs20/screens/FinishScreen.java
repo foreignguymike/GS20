@@ -72,6 +72,8 @@ public class FinishScreen extends GameScreen {
     private final ImageEntity restartButton;
     private final ImageEntity submitButton;
 
+    private float tickTime = 1;
+
     public FinishScreen(Context context, PlayData playData) {
         super(context);
         this.playData = playData;
@@ -143,10 +145,12 @@ public class FinishScreen extends GameScreen {
             if (Gdx.input.justTouched()) {
                 unproject();
                 if (restartButton.contains(m.x, m.y)) {
+                    context.audioHandler.playSound("click", 0.4f);
                     ignoreInput = true;
                     context.gsm.push(new FadeTransitionScreen(context, new PlayScreen(context, playData.difficulty), 2));
                 } else if (submitButton.contains(m.x, m.y)) {
                     if (canSubmit()) {
+                        context.audioHandler.playSound("click", 0.4f);
                         ignoreInput = true;
                         TransitionScreen screen = new FadeTransitionScreen(context, new SubmitScreen(context, playData.difficulty, finalScore), 2);
                         screen.duration = 1f;
@@ -183,7 +187,7 @@ public class FinishScreen extends GameScreen {
             time += dt;
             if (time > 0.75f) {
                 for (int i = 0; i < counts.length; i++) {
-                    counts[i] += 25f * dt;
+                    counts[i] += 50f * dt;
                     if (counts[i] >= finalCounts[i]) {
                         counts[i] = finalCounts[i];
                     }
@@ -198,6 +202,13 @@ public class FinishScreen extends GameScreen {
                 if (done) {
                     stage = Stage.COUNT_SCORE;
                     time = 0;
+                    tickTime = 1f;
+                } else {
+                    tickTime += dt;
+                    if (tickTime > 0.1f) {
+                        tickTime = 0;
+                        context.audioHandler.playSound("tick", 0.2f);
+                    }
                 }
             }
         } else if (stage == Stage.COUNT_SCORE) {
@@ -207,6 +218,12 @@ public class FinishScreen extends GameScreen {
                 if (score >= finalScore) {
                     score = finalScore;
                     stage = Stage.WAIT;
+                } else {
+                    tickTime += dt;
+                    if (tickTime > 0.1f) {
+                        tickTime = 0;
+                        context.audioHandler.playSound("tick", 0.2f);
+                    }
                 }
             }
         }
@@ -218,6 +235,7 @@ public class FinishScreen extends GameScreen {
         {
             b.setProjectionMatrix(uiViewport.getCamera().combined);
             b.setColor(0, 0, 0, fade);
+            //noinspection SuspiciousNameCombination
             b.draw(pixel, 0, 0, Constants.HEIGHT, Constants.HEIGHT);
 
             b.setProjectionMatrix(viewport.getCamera().combined);
