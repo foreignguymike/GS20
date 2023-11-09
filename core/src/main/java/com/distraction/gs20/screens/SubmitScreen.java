@@ -228,7 +228,7 @@ public class SubmitScreen extends GameScreen {
         if (success) {
             success = false;
             ignoreInput = true;
-            context.gsm.push(new FadeTransitionScreen(context, new PlayScreen(context, difficulty), 3));
+            context.gsm.push(new FadeTransitionScreen(context, new PlayScreen(context, difficulty)));
         }
     }
 
