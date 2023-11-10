@@ -1,7 +1,9 @@
 package com.distraction.gs20;
 
+import com.badlogic.gdx.Application;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Net;
 import com.badlogic.gdx.graphics.GL20;
 import com.distraction.gs20.gj.GameJoltClient;
@@ -22,6 +24,10 @@ public class GemSnag20 extends ApplicationAdapter {
         context.client = client;
 
         context.gsm.push(new PlayScreen(context, PlayScreen.Difficulty.CHALLENGE));
+
+        Gdx.input.setCatchKey(Input.Keys.DOWN, true);
+        Gdx.input.setCatchKey(Input.Keys.UP, true);
+        Gdx.app.setLogLevel(Application.LOG_INFO);
     }
 
     @Override

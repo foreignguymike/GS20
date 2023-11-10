@@ -42,6 +42,7 @@ import static com.badlogic.gdx.Input.Keys.X;
 import static com.badlogic.gdx.Input.Keys.Y;
 import static com.badlogic.gdx.Input.Keys.Z;
 
+import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.Net;
@@ -116,6 +117,7 @@ public class SubmitScreen extends GameScreen {
     private float time;
 
     private final ImageEntity submitButton;
+    private final ImageEntity backButton;
 
     public SubmitScreen(Context context, PlayScreen.Difficulty difficulty, int score) {
         super(context);
@@ -130,6 +132,9 @@ public class SubmitScreen extends GameScreen {
 
         submitButton = new ImageEntity(context.getImage("submit"));
         submitButton.p.set(Constants.WIDTH * 0.5f, Constants.HEIGHT * 0.35f);
+
+        backButton = new ImageEntity(context.getImage("back"));
+        backButton.p.set(Constants.HEIGHT * 0.155f, Constants.HEIGHT * 0.928f);
 
         Gdx.input.setInputProcessor(new InputAdapter() {
             @Override
@@ -209,6 +214,13 @@ public class SubmitScreen extends GameScreen {
         return name.length() > 0;
     }
 
+    private void back() {
+        success = false;
+        ignoreInput = true;
+        context.gsm.push(new FadeTransitionScreen(context, new PlayScreen(context, difficulty)));
+        context.audioHandler.playSound("success");
+    }
+
     @Override
     protected void handleInput() {
         if (ignoreInput) return;
@@ -218,6 +230,9 @@ public class SubmitScreen extends GameScreen {
             if (submitButton.contains(m.x, m.y)) {
                 context.audioHandler.playSound("click", 0.4f);
                 submit();
+            } else if (backButton.contains(m.x, m.y)) {
+                context.audioHandler.playSound("click", 0.4f);
+                back();
             }
         }
     }
@@ -227,10 +242,7 @@ public class SubmitScreen extends GameScreen {
         time += dt;
         handleInput();
         if (success) {
-            success = false;
-            ignoreInput = true;
-            context.gsm.push(new FadeTransitionScreen(context, new PlayScreen(context, difficulty)));
-            context.audioHandler.playSound("success");
+            back();
         }
     }
 
@@ -252,6 +264,7 @@ public class SubmitScreen extends GameScreen {
 
             b.setColor(1, 1, 1, 1);
             submitButton.render(b);
+            backButton.render(b);
 
             if (loading) {
                 for (int i = 0; i < 5; i++) {
