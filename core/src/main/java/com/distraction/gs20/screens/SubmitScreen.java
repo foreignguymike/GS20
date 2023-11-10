@@ -184,10 +184,9 @@ public class SubmitScreen extends GameScreen {
             @Override
             public void handleHttpResponse(Net.HttpResponse httpResponse) {
                 String res = httpResponse.getResultAsString();
-                Json json = new Json();
-                json.setIgnoreUnknownFields(true);
-                SubmitScoreResponse response = json.fromJson(SubmitScoreResponse.class, res);
-                if (response.response.success) {
+                // throwing an exception with SubmitScoreResponse here for some reason
+                // just doing a sus true check instead
+                if (res.contains("true")) {
                     submitted = true;
                     context.fetchLeaderboard(() -> success = true);
                 } else {
